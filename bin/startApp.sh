@@ -29,20 +29,26 @@ rm -rf "$TOMCAT_HOME/webapps/ROOT" "$TOMCAT_HOME/webapps/ROOT.war" "$TOMCAT_HOME
 cp "$PROJECT_DIR/target/cms4_prd.war" "$TOMCAT_HOME/webapps/ROOT.war"
 
 echo "[3/3] Tomcat 기동"
-# startup.sh(자체 백그라운드) / nohup+setsid+disown 둘 다 Jenkins에서 호출하면 몇 초 뒤 Tomcat이
-# 깔끔하게(=SIGTERM을 받아 자체 shutdown hook이 정상 종료 절차를 밟는 형태로) 죽는 걸 실제로 겪었다.
-# at(1)/atd로 큐에 넘기는 것만으로는 부족했다 - at은 "제출 시점"의 환경변수를 그대로 job 스크립트에
-# 박아 넣으므로, Jenkins가 심어둔 JENKINS_SERVER_COOKIE 등이 프로세스 계보와 무관하게 그대로 이
-# job에도 남아있었고, Jenkins의 프로세스 정리가 계보가 아니라 이 환경변수를 기준으로 스캔해서
-# 죽인 것이었다. at에 넘기기 "직전"에 그 변수들을 셸에서 지워야 job에도 안 들어간다.
-unset JENKINS_SERVER_COOKIE HUDSON_SERVER_COOKIE BUILD_ID BUILD_NUMBER BUILD_TAG BUILD_URL \
-      JOB_NAME JOB_BASE_NAME EXECUTOR_NUMBER NODE_NAME WORKSPACE JENKINS_URL 2>/dev/null || true
 mkdir -p "$TOMCAT_HOME/logs"
-at now <<ATEOF
-export JAVA_HOME="$JAVA_HOME"
-echo \$\$ > "$TOMCAT_HOME/tomcat.pid"
-exec "$TOMCAT_HOME/bin/catalina.sh" run >> "$TOMCAT_HOME/logs/catalina.out" 2>&1
-ATEOF
+START_CMD="export JAVA_HOME='$JAVA_HOME'; echo \$\$ > '$TOMCAT_HOME/tomcat.pid'; exec '$TOMCAT_HOME/bin/catalina.sh' run >> '$TOMCAT_HOME/logs/catalina.out' 2>&1"
+
+if [ "$(whoami)" = "jenkins" ]; then
+    # Jenkins(jenkins 계정)가 이 스크립트를 부르면 이야기가 다르다 - startup.sh 자체 백그라운드,
+    # nohup+setsid+disown, at(1)/atd 전부 몇 초 뒤 Tomcat이 깔끔하게(SIGTERM을 받아 자체 shutdown
+    # hook이 정상 종료 절차를 밟는 형태로) 죽는 걸 실제로 겪었다 - 심지어 at에 넘기기 전 관련
+    # 환경변수(JENKINS_SERVER_COOKIE 등)를 다 지워도 마찬가지였다. Jenkins의 Durable Task
+    # 프로세스 정리가 이 WSL 환경에서 정확히 어떤 기준으로 스캔하는지는 끝내 특정하지 못했지만,
+    # localhost로 SSH를 뜨면(PAM이 완전히 새 로그인 세션을 만든다) 그 추적 메커니즘이 뭐가 됐든
+    # 아예 무관한 별개 세션이 되어 확실하게 벗어난다 - 이 문제의 가장 확실한 해법이었다.
+    ssh -i /var/lib/jenkins/.ssh/localhost_deploy -o StrictHostKeyChecking=accept-new -o BatchMode=yes \
+        jysn007@localhost "$START_CMD"
+else
+    # 직접(jysn007) 실행할 때는 at(1)/atd 큐에 넘기는 것으로 충분하다 - 이 스크립트를 불러온 셸이
+    # 끝나도 옆에서 계속 떠 있어야 하니, 이 셸에 딸린 백그라운드 잡으로 두지 않는다는 점은 동일하다.
+    unset JENKINS_SERVER_COOKIE HUDSON_SERVER_COOKIE BUILD_ID BUILD_NUMBER BUILD_TAG BUILD_URL \
+          JOB_NAME JOB_BASE_NAME EXECUTOR_NUMBER NODE_NAME WORKSPACE JENKINS_URL 2>/dev/null || true
+    echo "$START_CMD" | at now
+fi
 sleep 2
 
 echo "완료. http://localhost:7080/ 로 접속하세요 (기동까지 몇 초 걸릴 수 있습니다)."
