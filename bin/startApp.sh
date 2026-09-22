@@ -23,19 +23,21 @@ cd "$PROJECT_DIR"
 mvn -q clean package -DskipTests
 
 echo "[2/3] Tomcat 정지(구동 중이면) 및 이전 배포본 정리"
-CATALINA_PID="$TOMCAT_HOME/tomcat.pid" "$TOMCAT_HOME/bin/shutdown.sh" 2>/dev/null || true
-sleep 3
+"$SCRIPT_DIR/stopApp.sh" || true
+sleep 2
 rm -rf "$TOMCAT_HOME/webapps/ROOT" "$TOMCAT_HOME/webapps/ROOT.war" "$TOMCAT_HOME/work"/*
 cp "$PROJECT_DIR/target/cms4_prd.war" "$TOMCAT_HOME/webapps/ROOT.war"
 
 echo "[3/3] Tomcat 기동"
-# Jenkins에서 이 스크립트를 호출하면, Jenkins는 빌드가 끝날 때 이 빌드가 띄운 프로세스를 전부
-# 정리(kill)한다 - 그 판단 기준이 세션/프로세스 그룹이 아니라 환경변수(JENKINS_SERVER_COOKIE 등)를
-# 물려받았는지라서, setsid로 세션만 분리해서는 안 죽는다는 보장이 안 된다(실제로 한 번 죽었다).
-# 그래서 Jenkins가 심어둔 환경변수를 통째로 지운 뒤(env -u ...) setsid로 새 세션에 띄운다 -
-# 이러면 Jenkins가 "이 프로세스는 내가 띄운 빌드 소속"이라고 인식할 방법이 아예 없어진다.
-env -u JENKINS_SERVER_COOKIE -u HUDSON_SERVER_COOKIE -u BUILD_ID -u BUILD_NUMBER -u BUILD_TAG \
-    CATALINA_PID="$TOMCAT_HOME/tomcat.pid" \
-    setsid "$TOMCAT_HOME/bin/startup.sh" < /dev/null > /dev/null 2>&1
+# startup.sh/shutdown.sh(포트 8005로 SHUTDOWN 문자열을 보내는 방식) 대신 catalina.sh run(포그라운드
+# 실행)을 직접 nohup+disown으로 떼어낸다 - Jenkins에서 이 스크립트를 부르면, Jenkins는 빌드가 끝날 때
+# 자기가 띄운 프로세스를 정리(kill)하는데, startup.sh가 내부적으로 만드는 백그라운드 프로세스는
+# (setsid로 세션을 분리해도, Jenkins 쪽 환경변수를 지워도) 여전히 SIGTERM을 받아 Tomcat 자체
+# shutdown hook이 깔끔하게 내려버리는 걸 실제로 겪었다. nohup+disown으로 셸의 잡 테이블에서
+# 완전히 떼어내는 조합이 이런 CI 환경에서 데몬을 살려두는 가장 확실한 방법이다.
+mkdir -p "$TOMCAT_HOME/logs"
+nohup setsid "$TOMCAT_HOME/bin/catalina.sh" run < /dev/null >> "$TOMCAT_HOME/logs/catalina.out" 2>&1 &
+disown
+echo $! > "$TOMCAT_HOME/tomcat.pid"
 
 echo "완료. http://localhost:7080/ 로 접속하세요 (기동까지 몇 초 걸릴 수 있습니다)."
