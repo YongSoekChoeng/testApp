@@ -54,10 +54,10 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo '====== Deploy(Build+Start) Application ======'
-                // Tomcat은 빌드가 끝난 뒤에도 계속 떠 있어야 하는 데몬 프로세스다. Jenkins는 빌드가
-                // 끝나면 자신이 띄운 프로세스 트리를 기본적으로 다 정리(kill)하는데, BUILD_ID를
-                // "dontKillMe"로 바꿔주면 그 프로세스 트리 킬러가 이 프로세스는 건너뛴다.
-                sh 'BUILD_ID=dontKillMe ${DEPLOY_DIR}/bin/startApp.sh'
+                // startApp.sh가 at(1)/atd로 Tomcat을 띄운다 - Jenkins Pipeline의 sh 스텝이 끝날 때마다
+                // 그 스텝이 띄운 프로세스 트리를 정리하는데(nohup/setsid/disown으로도 못 벗어났다),
+                // at 큐에 넘긴 작업은 atd가 실행하는 완전히 별도의 프로세스라 그 트리에 아예 속하지 않는다.
+                sh '${DEPLOY_DIR}/bin/startApp.sh'
             }
         }
 
@@ -67,10 +67,6 @@ pipeline {
                 sh '''
                     sleep 15
                     ${DEPLOY_DIR}/bin/statusApp.sh
-                    echo "---diag---"
-                    PID=$(cat /opt/tomcat9/tomcat.pid)
-                    ps -eo pid,ppid,pgid,sid,tty,stat,cmd | grep -E "^[[:space:]]*$PID " || echo "process not found in ps"
-                    echo "this shell: pid=$$ pgid=$(ps -o pgid= -p $$) sid=$(ps -o sid= -p $$)"
                     ${DEPLOY_DIR}/bin/statusApp.sh | grep -q RUNNING
                 '''
             }

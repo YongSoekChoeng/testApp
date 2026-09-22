@@ -29,15 +29,18 @@ rm -rf "$TOMCAT_HOME/webapps/ROOT" "$TOMCAT_HOME/webapps/ROOT.war" "$TOMCAT_HOME
 cp "$PROJECT_DIR/target/cms4_prd.war" "$TOMCAT_HOME/webapps/ROOT.war"
 
 echo "[3/3] Tomcat 기동"
-# startup.sh/shutdown.sh(포트 8005로 SHUTDOWN 문자열을 보내는 방식) 대신 catalina.sh run(포그라운드
-# 실행)을 직접 nohup+disown으로 떼어낸다 - Jenkins에서 이 스크립트를 부르면, Jenkins는 빌드가 끝날 때
-# 자기가 띄운 프로세스를 정리(kill)하는데, startup.sh가 내부적으로 만드는 백그라운드 프로세스는
-# (setsid로 세션을 분리해도, Jenkins 쪽 환경변수를 지워도) 여전히 SIGTERM을 받아 Tomcat 자체
-# shutdown hook이 깔끔하게 내려버리는 걸 실제로 겪었다. nohup+disown으로 셸의 잡 테이블에서
-# 완전히 떼어내는 조합이 이런 CI 환경에서 데몬을 살려두는 가장 확실한 방법이다.
+# startup.sh(자체 백그라운드) / nohup+setsid+disown 둘 다 Jenkins에서 호출하면 몇 초 뒤 Tomcat이
+# 깔끔하게(=SIGTERM을 받아 자체 shutdown hook이 정상 종료 절차를 밟는 형태로) 죽는 걸 실제로 겪었다 -
+# Jenkins의 Durable Task 플러그인은 Pipeline의 sh 스텝 하나가 끝날 때마다 그 스텝이 띄운 프로세스
+# 트리를 정리하는데, 같은 프로세스 트리 안에서는 어떤 detach 기법을 써도 완전히 벗어나지 못했다.
+# at(1)/atd로 아예 별도의 큐에 작업을 넘기면 atd 데몬이 실행하는 완전히 독립된 프로세스가 되어
+# Jenkins가 만든 프로세스 트리와 조상 관계 자체가 없어진다 - 이 문제의 가장 확실한 해법이다.
 mkdir -p "$TOMCAT_HOME/logs"
-nohup setsid "$TOMCAT_HOME/bin/catalina.sh" run < /dev/null >> "$TOMCAT_HOME/logs/catalina.out" 2>&1 &
-disown
-echo $! > "$TOMCAT_HOME/tomcat.pid"
+at now <<ATEOF
+export JAVA_HOME="$JAVA_HOME"
+echo \$\$ > "$TOMCAT_HOME/tomcat.pid"
+exec "$TOMCAT_HOME/bin/catalina.sh" run >> "$TOMCAT_HOME/logs/catalina.out" 2>&1
+ATEOF
+sleep 2
 
 echo "완료. http://localhost:7080/ 로 접속하세요 (기동까지 몇 초 걸릴 수 있습니다)."
