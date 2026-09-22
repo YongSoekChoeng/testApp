@@ -19,6 +19,6 @@
 
 	<entry key="Globals.DBGubun">local</entry>
 	<entry key="local.Globals.LogerYN">Y</entry>
-	<entry key="local.Globals.httpdomain">http://localhost:7080/</entry>
-	<entry key="local.Globals.ANYBIZ_ErpUrl">http://localhost:7080/</entry>
+	<entry key="local.Globals.httpdomain">http://localhost:6080/</entry>
+	<entry key="local.Globals.ANYBIZ_ErpUrl">http://localhost:6080/</entry>
 </properties>
