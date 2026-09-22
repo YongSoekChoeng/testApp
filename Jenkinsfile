@@ -67,6 +67,10 @@ pipeline {
                 sh '''
                     sleep 15
                     ${DEPLOY_DIR}/bin/statusApp.sh
+                    echo "---diag---"
+                    PID=$(cat /opt/tomcat9/tomcat.pid)
+                    ps -eo pid,ppid,pgid,sid,tty,stat,cmd | grep -E "^[[:space:]]*$PID " || echo "process not found in ps"
+                    echo "this shell: pid=$$ pgid=$(ps -o pgid= -p $$) sid=$(ps -o sid= -p $$)"
                     ${DEPLOY_DIR}/bin/statusApp.sh | grep -q RUNNING
                 '''
             }
