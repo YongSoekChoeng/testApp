@@ -1,5 +1,5 @@
 -- testApp 로컬 MySQL 스키마
--- 원본(cms4_prd)은 Oracle 메인 DB + MariaDB(ERP/정보계) 3개로 나뉘어 있었으나,
+-- 원본(testApp)은 Oracle 메인 DB + MariaDB(ERP/정보계) 3개로 나뉘어 있었으나,
 -- 이 테스트 프로젝트는 로그인 + ERP 조회 + 공통코드관리 + 회원사관리 + 로그/파일 화면만 남기고
 -- 로컬 MySQL 하나로 합쳤다. 컬럼 정의는 각 매퍼 XML의 주석(원본 Oracle 컬럼 타입)을 MySQL로 옮긴 것이다.
 -- ERP 업무 데이터 조회용 통계/계약 관련 테이블(tbcn_*, su_* 등, erp-mapper.xml의 selectErp* 29종)은

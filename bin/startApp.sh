@@ -26,7 +26,7 @@ echo "[2/3] Tomcat 정지(구동 중이면) 및 이전 배포본 정리"
 "$SCRIPT_DIR/stopApp.sh" || true
 sleep 2
 rm -rf "$TOMCAT_HOME/webapps/ROOT" "$TOMCAT_HOME/webapps/ROOT.war" "$TOMCAT_HOME/work"/*
-cp "$PROJECT_DIR/target/cms4_prd.war" "$TOMCAT_HOME/webapps/ROOT.war"
+cp "$PROJECT_DIR/target/testApp.war" "$TOMCAT_HOME/webapps/ROOT.war"
 
 echo "[3/3] Tomcat 기동"
 mkdir -p "$TOMCAT_HOME/logs"

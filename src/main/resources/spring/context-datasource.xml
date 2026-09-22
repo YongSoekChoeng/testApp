@@ -12,7 +12,7 @@
 	<context:property-placeholder location="classpath:/properties/globals.xml" />
 
 	<!--
-		원본(cms4_prd)은 Oracle(CMS 메인) + MariaDB(ANYBIZ/ERP) + MariaDB(RELAY/정보계) 3개 데이터소스를 썼다.
+		원본(testApp)은 Oracle(CMS 메인) + MariaDB(ANYBIZ/ERP) + MariaDB(RELAY/정보계) 3개 데이터소스를 썼다.
 		이 테스트 프로젝트는 로그인 + ERP + 공통코드 + 회원관리 화면만 남기고, 전부 로컬 MySQL 하나로 합쳤다.
 		기존 Java 코드는 getSqlSession()/getSqlSessionAnybiz() 두 가지를 그대로 호출하므로,
 		두 빈 이름을 모두 같은 데이터소스에 alias로 연결해 Java/매퍼 호출부는 건드리지 않는다.
