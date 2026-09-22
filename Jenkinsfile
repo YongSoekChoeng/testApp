@@ -35,7 +35,10 @@ pipeline {
                     # --no-owner --no-group: Jenkins(jenkins 계정)는 /app/testApp(jysn007 소유)의
                     # 기존 디렉토리 소유권을 바꿀 권한이 없다(그룹에 써넣기 권한만 있음) - 소유권 동기화는
                     # 생략하고 내용만 맞춘다.
-                    rsync -rlptD --no-owner --no-group --omit-dir-times --delete --exclude=.git --exclude=target ./ ${DEPLOY_DIR}/
+                    # 메타데이터(소유권/권한/시간) 보존을 전부 껐다 - jenkins 계정은 이미 jysn007 소유로
+                    # 있는 기존 디렉토리들의 메타데이터를 바꿀 권한이 없고(그룹 쓰기 권한만 있음),
+                    # 여기서는 파일 내용만 맞으면 된다. 새로 생기는 실행권한(.sh)은 바로 뒤에서 따로 준다.
+                    rsync -rL --no-perms --no-owner --no-group --omit-dir-times --delete --exclude=.git --exclude=target ./ ${DEPLOY_DIR}/
                     chmod +x ${DEPLOY_DIR}/bin/*.sh
                 '''
             }
