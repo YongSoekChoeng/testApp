@@ -39,9 +39,12 @@ if [ "$(whoami)" = "jenkins" ]; then
     # 환경변수(JENKINS_SERVER_COOKIE 등)를 다 지워도 마찬가지였다. Jenkins의 Durable Task
     # 프로세스 정리가 이 WSL 환경에서 정확히 어떤 기준으로 스캔하는지는 끝내 특정하지 못했지만,
     # localhost로 SSH를 뜨면(PAM이 완전히 새 로그인 세션을 만든다) 그 추적 메커니즘이 뭐가 됐든
-    # 아예 무관한 별개 세션이 되어 확실하게 벗어난다 - 이 문제의 가장 확실한 해법이었다.
+    # 아예 무관한 별개 세션이 되어 확실하게 벗어난다.
+    # SSH 명령 자체를 foreground로 그냥 실행하면(catalina.sh run이 exec로 안 끝나고 계속 떠 있으니)
+    # ssh 세션이 그 프로세스가 끝날 때까지 안 끝나고 걸려버린다 - 그래서 SSH 너머에서도 그 자리에서
+    # 바로 at(1)에 다시 넘겨서, ssh 명령 자체는 "예약만 하고" 즉시 끝나도록 한다.
     ssh -i /var/lib/jenkins/.ssh/localhost_deploy -o StrictHostKeyChecking=accept-new -o BatchMode=yes \
-        jysn007@localhost "$START_CMD"
+        jysn007@localhost "echo \"$START_CMD\" | at now"
 else
     # 직접(jysn007) 실행할 때는 at(1)/atd 큐에 넘기는 것으로 충분하다 - 이 스크립트를 불러온 셸이
     # 끝나도 옆에서 계속 떠 있어야 하니, 이 셸에 딸린 백그라운드 잡으로 두지 않는다는 점은 동일하다.
