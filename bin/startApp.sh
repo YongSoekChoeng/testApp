@@ -30,11 +30,13 @@ cp "$PROJECT_DIR/target/cms4_prd.war" "$TOMCAT_HOME/webapps/ROOT.war"
 
 echo "[3/3] Tomcat 기동"
 # startup.sh(자체 백그라운드) / nohup+setsid+disown 둘 다 Jenkins에서 호출하면 몇 초 뒤 Tomcat이
-# 깔끔하게(=SIGTERM을 받아 자체 shutdown hook이 정상 종료 절차를 밟는 형태로) 죽는 걸 실제로 겪었다 -
-# Jenkins의 Durable Task 플러그인은 Pipeline의 sh 스텝 하나가 끝날 때마다 그 스텝이 띄운 프로세스
-# 트리를 정리하는데, 같은 프로세스 트리 안에서는 어떤 detach 기법을 써도 완전히 벗어나지 못했다.
-# at(1)/atd로 아예 별도의 큐에 작업을 넘기면 atd 데몬이 실행하는 완전히 독립된 프로세스가 되어
-# Jenkins가 만든 프로세스 트리와 조상 관계 자체가 없어진다 - 이 문제의 가장 확실한 해법이다.
+# 깔끔하게(=SIGTERM을 받아 자체 shutdown hook이 정상 종료 절차를 밟는 형태로) 죽는 걸 실제로 겪었다.
+# at(1)/atd로 큐에 넘기는 것만으로는 부족했다 - at은 "제출 시점"의 환경변수를 그대로 job 스크립트에
+# 박아 넣으므로, Jenkins가 심어둔 JENKINS_SERVER_COOKIE 등이 프로세스 계보와 무관하게 그대로 이
+# job에도 남아있었고, Jenkins의 프로세스 정리가 계보가 아니라 이 환경변수를 기준으로 스캔해서
+# 죽인 것이었다. at에 넘기기 "직전"에 그 변수들을 셸에서 지워야 job에도 안 들어간다.
+unset JENKINS_SERVER_COOKIE HUDSON_SERVER_COOKIE BUILD_ID BUILD_NUMBER BUILD_TAG BUILD_URL \
+      JOB_NAME JOB_BASE_NAME EXECUTOR_NUMBER NODE_NAME WORKSPACE JENKINS_URL 2>/dev/null || true
 mkdir -p "$TOMCAT_HOME/logs"
 at now <<ATEOF
 export JAVA_HOME="$JAVA_HOME"
