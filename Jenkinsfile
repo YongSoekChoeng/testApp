@@ -54,7 +54,10 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo '====== Deploy(Build+Start) Application ======'
-                sh '${DEPLOY_DIR}/bin/startApp.sh'
+                // Tomcat은 빌드가 끝난 뒤에도 계속 떠 있어야 하는 데몬 프로세스다. Jenkins는 빌드가
+                // 끝나면 자신이 띄운 프로세스 트리를 기본적으로 다 정리(kill)하는데, BUILD_ID를
+                // "dontKillMe"로 바꿔주면 그 프로세스 트리 킬러가 이 프로세스는 건너뛴다.
+                sh 'BUILD_ID=dontKillMe ${DEPLOY_DIR}/bin/startApp.sh'
             }
         }
 
