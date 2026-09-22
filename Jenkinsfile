@@ -32,7 +32,10 @@ pipeline {
                 echo '====== 배포 경로로 동기화 ======'
                 sh '''
                     mkdir -p ${DEPLOY_DIR}
-                    rsync -a --delete --exclude=.git --exclude=target ./ ${DEPLOY_DIR}/
+                    # --no-owner --no-group: Jenkins(jenkins 계정)는 /app/testApp(jysn007 소유)의
+                    # 기존 디렉토리 소유권을 바꿀 권한이 없다(그룹에 써넣기 권한만 있음) - 소유권 동기화는
+                    # 생략하고 내용만 맞춘다.
+                    rsync -rlptD --no-owner --no-group --delete --exclude=.git --exclude=target ./ ${DEPLOY_DIR}/
                     chmod +x ${DEPLOY_DIR}/bin/*.sh
                 '''
             }
