@@ -29,10 +29,13 @@ rm -rf "$TOMCAT_HOME/webapps/ROOT" "$TOMCAT_HOME/webapps/ROOT.war" "$TOMCAT_HOME
 cp "$PROJECT_DIR/target/cms4_prd.war" "$TOMCAT_HOME/webapps/ROOT.war"
 
 echo "[3/3] Tomcat 기동"
-# setsid로 완전히 새 세션에 띄운다 - Jenkins에서 이 스크립트를 호출할 경우, Jenkins가 빌드 종료 시
-# 자기가 띄운 프로세스 트리를 정리(kill)하는데 Tomcat은 빌드가 끝난 뒤에도 계속 떠 있어야 하는
-# 데몬이라 그 정리 대상에서 제외되어야 한다. setsid로 세션을 분리해두면(BUILD_ID=dontKillMe 같은
-# Jenkins 쪽 예외처리에 기대지 않고) 어느 쪽에서 실행하든 안전하게 살아남는다.
-CATALINA_PID="$TOMCAT_HOME/tomcat.pid" setsid "$TOMCAT_HOME/bin/startup.sh" < /dev/null > /dev/null 2>&1
+# Jenkins에서 이 스크립트를 호출하면, Jenkins는 빌드가 끝날 때 이 빌드가 띄운 프로세스를 전부
+# 정리(kill)한다 - 그 판단 기준이 세션/프로세스 그룹이 아니라 환경변수(JENKINS_SERVER_COOKIE 등)를
+# 물려받았는지라서, setsid로 세션만 분리해서는 안 죽는다는 보장이 안 된다(실제로 한 번 죽었다).
+# 그래서 Jenkins가 심어둔 환경변수를 통째로 지운 뒤(env -u ...) setsid로 새 세션에 띄운다 -
+# 이러면 Jenkins가 "이 프로세스는 내가 띄운 빌드 소속"이라고 인식할 방법이 아예 없어진다.
+env -u JENKINS_SERVER_COOKIE -u HUDSON_SERVER_COOKIE -u BUILD_ID -u BUILD_NUMBER -u BUILD_TAG \
+    CATALINA_PID="$TOMCAT_HOME/tomcat.pid" \
+    setsid "$TOMCAT_HOME/bin/startup.sh" < /dev/null > /dev/null 2>&1
 
 echo "완료. http://localhost:7080/ 로 접속하세요 (기동까지 몇 초 걸릴 수 있습니다)."
