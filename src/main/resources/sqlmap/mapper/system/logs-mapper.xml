@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+	원본은 Oracle 시퀀스(TBSY_ERROR_LOG_SEQ/TBSY_ACTION_LOG_SEQ)로 seq 값을 채우고, 조직도(tbin_scd)를
+	SYS_CONNECT_BY_PATH로 펼쳐 로그를 남긴 사람의 소속 조직명을 함께 보여줬다. 이 테스트 프로젝트는
+	인사/조직 모듈(insa/org) 자체를 범위에서 뺐으므로, seq는 MySQL AUTO_INCREMENT로 바꾸고 조직 조인은
+	제거했다(로그 목록에 조직명 컬럼만 빠질 뿐, 로그 자체는 그대로 남는다).
+-->
+<mapper namespace="logs">
+	<insert id="insertJoinSendLog" parameterType="kr.co.gnx.logs.LoginHistVO">
+		/* tbsy_join_hist[[SY][시스템] 회원가입 인증로그] INSERT - insertJoinSendLog */
+		INSERT INTO tbsy_join_hist /* [SY][시스템] 회원가입 인증로그 */
+			 ( send_type    /* 구분       VARCHAR(20)  */
+			 , sender       /* 보내는사람 VARCHAR(50)  */
+			 , reciver      /* 받는사람   VARCHAR(50)  */
+			 , message      /* 메세지     VARCHAR(300) */
+			 , in_dtm       /* 전송일시   DATETIME     */
+			 )
+		VALUES
+			 ( #{send_type}   /* 구분       VARCHAR(20)  */
+			 , #{sender}      /* 보내는사람 VARCHAR(50)  */
+			 , #{reciver}     /* 받는사람   VARCHAR(50)  */
+			 , #{message}     /* 메세지     VARCHAR(300) */
+			 , NOW()          /* 전송일시   DATETIME     */
+			 )
+	</insert>
+	<insert id="insertErrorLog" parameterType="kr.co.gnx.logs.ErrorLogVO">
+		/* logs-mapper.xml id="insertErrorLog" 에러 로그 저장  */
+		INSERT
+		  INTO tbsy_error_log
+		  	 ( mb_id                 /* 회사코드 VARCHAR(20)*/
+			 , emp_cd                /* 에러 발생자 사번 VARCHAR(40)*/
+			 , action_type			 /* 행위 유형 VARCHAR(20) */
+			 , error_url             /* 에러 발생 URL VARCHAR(20)*/
+			 , error_query_string    /* 전달된 파라미터 값 VARCHAR(1000)*/
+			 , error_status          /* 에러 상태 코드 VARCHAR(40)*/
+			 , error_class           /* 에러 발생 클래스 VARCHAR(400)*/
+			 , error_msg             /* 에러 메세지 VARCHAR(4000)*/
+			 , error_trace           /* 에러 추적 메세지 VARCHAR(4000)*/
+			 , error_ip              /* 에러 발생 IP VARCHAR(100)*/
+			 , in_dtm                /* 에러 발생 시간 DATETIME */
+		  	 )
+		VALUES
+			 ( #{mb_id}
+			 , #{emp_cd}
+			 , #{action_type}
+			 , #{error_url}
+			 , #{error_query_string}
+			 , #{error_status}
+			 , #{error_class}
+			 , #{error_msg}
+			 , #{error_trace}
+			 , #{error_ip}
+			 , NOW()
+			 )
+	</insert>
+
+
+	<insert id="insertActionLog" parameterType="kr.co.gnx.logs.ActionLogVO">
+		/* logs-mapper.xml id="insertActionLog" 액션 로그 입력 */
+		INSERT
+		  INTO tbsy_action_log
+		  	 ( mb_id                    /* 회사코드 VARCHAR(20)*/
+			 , emp_cd                 /* 행위자 사번 VARCHAR(40)*/
+			 , action_type            /* 행위 유형 VARCHAR(20)*/
+			 , logging_ymd
+			 , action_url             /* 호출 URL VARCHAR(200)*/
+			 , action_query_string    /* URL에 전달된 파라미터 값 VARCHAR(1000)*/
+			 , action_ip              /* 행위자 IP VARCHAR(100)*/
+			 , in_dtm                 /* 입력 시간 DATETIME*/
+		  	 )
+		VALUES
+			 ( #{mb_id}
+			 , #{emp_cd}
+			 , #{action_type}
+			 , DATE_FORMAT(NOW(), '%Y-%m-%d')
+			 , #{action_url}
+			 , #{action_query_string}
+			 , #{action_ip}
+			 , NOW()
+			 )
+	</insert>
+
+	<sql id="selectLoginHistListSql">
+			/* logs-mapper.xml id="selectLoginHistListSql" 로그인 기록 조회 쿼리 */
+			SELECT tb1.mb_id         /* 회사코드 VARCHAR(20)*/
+				 , tb1.emp_cd        /* 사원코드 VARCHAR(20)*/
+				 , tb2.emp_nm
+				 , tb1.login_ip      /* 로그인IP VARCHAR(40)*/
+				 , DATE_FORMAT(tb1.login_dtm, '%Y-%m-%d %H:%i:%s') AS login_dtm    /* 로그인일시 DATETIME*/
+				 , tb1.memo          /* 메모 VARCHAR(200)*/
+			  FROM tbsy_login_hist tb1
+   LEFT OUTER JOIN tbin_empmst tb2
+   				ON tb1.mb_id = tb2.mb_id
+   			   AND tb1.emp_cd = tb2.emp_cd
+			 WHERE tb1.mb_id = #{mb_id}
+			   AND tb1.emp_cd NOT IN ('SADMIN')
+			   AND DATE_FORMAT(tb1.login_dtm, '%Y-%m-%d') BETWEEN IFNULL(#{srch_term_start_value}, '1900-01-01') AND IFNULL(#{srch_term_end_value}, '2099-12-31')
+			 <if test="@kr.co.gnx.comm.util.CommUtil@isNotEmpty(srch_emp_value)">
+			   AND (tb1.emp_cd LIKE CONCAT('%',#{srch_emp_value},'%') OR tb2.emp_nm LIKE CONCAT('%',#{srch_emp_value},'%'))
+			 </if>
+	</sql>
+
+	<select id="selectLoginHistList" parameterType="kr.co.gnx.logs.LoginHistVO" resultType="bmap">
+		/* logs-mapper.xml id="selectLoginHistList" 로그인 기록 조회 */
+		<include refid="Comm.PagingStart"/>
+		<include refid="selectLoginHistListSql"/>
+		<include refid="Comm.PagingEnd"/>
+	</select>
+
+	<select id="selectLoginHistDtm" parameterType="kr.co.gnx.logs.LoginHistVO" resultType="bmap">
+		/* logs-mapper.xml id="selectLoginHistList" 로그인 기록 조회 */
+		SELECT mb_id
+		     , emp_cd
+		     , DATE_FORMAT(MAX(login_dtm), '%Y-%m-%d %H:%i:%s') AS login_dtm
+		  FROM tbsy_login_hist
+		 WHERE mb_id = #{mb_id}
+		   AND emp_cd = #{emp_cd}
+		 GROUP BY mb_id, emp_cd
+	</select>
+
+	<sql id="selectActionLogListSql">
+			/* logs-mapper.xml id="selectActionLogListSql" 액션 로그 리스트 조회 쿼리 */
+			SELECT tb1.mb_id                     /* 회사코드 VARCHAR(20)*/
+				 , tb1.emp_cd                    /* 행위자 사번 VARCHAR(40)*/
+				 , tb2.emp_nm
+				 , tb1.action_type               /* 행위 유형 VARCHAR(20)*/
+				 , tb4.cd_vl_nm AS action_type_nm
+				 , tb1.action_url                /* 호출 URL VARCHAR(200)*/
+				 , tb1.action_query_string       /* URL에 전달된 파라미터 값 VARCHAR(1000)*/
+				 , tb1.action_ip                 /* 행위자 IP VARCHAR(100)*/
+				 , DATE_FORMAT(tb1.in_dtm, '%Y-%m-%d %H:%i:%s') AS in_dtm                    /* 입력 시간 DATETIME*/
+			  FROM tbsy_action_log tb1
+   LEFT OUTER JOIN tbin_empmst tb2
+   				ON tb1.mb_id = tb2.mb_id
+   			   AND tb1.emp_cd = tb2.emp_cd
+   LEFT OUTER JOIN (SELECT * FROM tbcm_common_code WHERE mb_id = #{mb_id} AND grp_cmm_cd = 'ACTION_TYPE') tb4
+   				ON tb1.mb_id = tb4.mb_id
+   			   AND tb1.action_type = tb4.cd_vl
+   			 WHERE tb1.mb_id = #{mb_id}
+   			   AND tb1.emp_cd NOT IN ('SADMIN')
+   			   AND DATE_FORMAT(tb1.in_dtm, '%Y-%m-%d') BETWEEN IFNULL(#{srch_term_start_value}, '1900-01-01') AND IFNULL(#{srch_term_end_value}, '2099-12-31')
+			 <if test="@kr.co.gnx.comm.util.CommUtil@isNotEmpty(srch_emp_value)">
+			   AND (tb1.emp_cd LIKE CONCAT('%',#{srch_emp_value},'%') OR tb2.emp_nm LIKE CONCAT('%',#{srch_emp_value},'%'))
+			 </if>
+	</sql>
+
+	<select id="selectActionLogList" parameterType="kr.co.gnx.logs.ActionLogVO" resultType="bmap">
+		/* logs-mapper.xml id="selectActionLogList" 액션 로그 리스트 조회  */
+		<include refid="Comm.PagingStart"/>
+		<include refid="selectActionLogListSql"/>
+		<include refid="Comm.PagingEnd"/>
+	</select>
+
+	<sql id="selectErrorLogListSql">
+			/* logs-mapper.xml id="selectErrorLogListSql" 에러 로그 리스트 조회 쿼리 */
+			SELECT tb1.mb_id                /* 회사코드 VARCHAR(20)*/
+				 , tb1.emp_cd               /* 에러 발생자 사번 VARCHAR(40)*/
+				 , tb2.emp_nm
+	             , tb1.action_type
+	             , tb4.cd_vl_nm AS action_type_nm
+				 , tb1.error_url            /* 에러 발생 URL VARCHAR(200)*/
+				 , tb1.error_query_string   /* 전달된 파라미터 값 VARCHAR(1000)*/
+				 , tb1.error_status         /* 에러 상태 코드 VARCHAR(40)*/
+				 , tb1.error_class          /* 에러 발생 클래스 VARCHAR(400)*/
+				 , tb1.error_msg            /* 에러 메세지 VARCHAR(4000)*/
+				 , tb1.error_trace          /* 에러 추적 메세지 VARCHAR(4000)*/
+				 , tb1.error_ip             /* 에러 발생 IP VARCHAR(100)*/
+				 , DATE_FORMAT(tb1.in_dtm, '%Y-%m-%d %H:%i:%s') AS in_dtm	/* 에러 발생 시간 DATETIME */
+			  FROM tbsy_error_log tb1
+   LEFT OUTER JOIN tbin_empmst tb2
+   				ON tb1.mb_id = tb2.mb_id
+   			   AND tb1.emp_cd = tb2.emp_cd
+   LEFT OUTER JOIN (SELECT * FROM tbcm_common_code WHERE mb_id = #{mb_id} AND grp_cmm_cd = 'ACTION_TYPE') tb4
+   				ON tb1.mb_id = tb4.mb_id
+   			   AND tb1.action_type = tb4.cd_vl
+   			 WHERE tb1.mb_id = #{mb_id}
+   			   AND tb1.emp_cd NOT IN ('SADMIN')
+   			   AND DATE_FORMAT(tb1.in_dtm, '%Y-%m-%d') BETWEEN IFNULL(#{srch_term_start_value}, '1900-01-01') AND IFNULL(#{srch_term_end_value}, '2099-12-31')
+			 <if test="@kr.co.gnx.comm.util.CommUtil@isNotEmpty(srch_emp_value)">
+			   AND (tb1.emp_cd LIKE CONCAT('%',#{srch_emp_value},'%') OR tb2.emp_nm LIKE CONCAT('%',#{srch_emp_value},'%'))
+			 </if>
+	</sql>
+
+	<select id="selectErrorLogList" parameterType="kr.co.gnx.logs.ErrorLogVO" resultType="bmap">
+		/* logs-mapper.xml id="selectErrorLogList" 에러 로그 리스트 조회 */
+		<include refid="Comm.PagingStart"/>
+		<include refid="selectErrorLogListSql"/>
+		<include refid="Comm.PagingEnd"/>
+	</select>
+</mapper>

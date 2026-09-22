@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+                                 http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+                                 http://www.springframework.org/schema/security
+                                 http://www.springframework.org/schema/security/spring-security-4.2.xsd">
+
+	<http pattern="/comm/**/*"             security="none"/>
+    <http pattern="/resources/**/*"        security="none"/>
+    <http pattern="/favicon.ico"           security="none"/>
+
+
+	<http auto-config="true" use-expressions="true" authentication-manager-ref="authenticationManagerWeb">
+		<headers>
+    		<frame-options disabled="true"></frame-options>
+    	</headers>
+    	
+    	<!-- <access-denied-handler error-page="/Access_Denied"/> -->
+    	<access-denied-handler ref="acessDeniedHandler"/>
+        <intercept-url pattern="/*" 			access="permitAll" />
+        <intercept-url pattern="/login.do" 		access="permitAll" />
+        <custom-filter after="BASIC_AUTH_FILTER" ref="jwtAuthenticationFilter"/>
+        
+        <form-login 
+        			login-processing-url="/login.do"
+        			username-parameter="login_id"
+        			password-parameter="login_pw"
+        			authentication-success-handler-ref="customSuccessHandler" 
+        			authentication-failure-handler-ref="customFailureHandler" />
+		
+		<logout invalidate-session="true" logout-success-url="/login.go" logout-url="/logout.do" />
+		<csrf request-matcher-ref="csrfSecurityRequestMatcher"/>
+    </http>
+    
+	<beans:bean id="jwtAuthenticationFilter" class="kr.co.gnx.filter.JwtAuthenticationFilter" />
+	<beans:bean id="customAuthenticationProvider"	class="kr.co.gnx.security.CustomAuthenticationProvider" />
+    <beans:bean id="acessDeniedHandler"				class="kr.co.gnx.security.handler.AcessDeniedHandler">
+    	<beans:property name="redirect" value="false"></beans:property>
+    	<beans:property name="errorPage" value="/Access_Denied"></beans:property>
+    </beans:bean>
+	<beans:bean id="customSuccessHandler"			class="kr.co.gnx.security.handler.CustomSuccessHandler" />
+	<beans:bean id="customFailureHandler"			class="kr.co.gnx.security.handler.CustomFailureHandler" />    
+    <authentication-manager id="authenticationManagerWeb">
+    	<authentication-provider ref="customAuthenticationProvider"/>
+    </authentication-manager>
+	<beans:bean id="csrfSecurityRequestMatcher"		class="kr.co.gnx.security.CsrfSecurityRequestMatcher"/>
+
+	<beans:bean id="passwordEncoder" class="org.springframework.security.crypto.password.StandardPasswordEncoder" />
+
+</beans:beans>

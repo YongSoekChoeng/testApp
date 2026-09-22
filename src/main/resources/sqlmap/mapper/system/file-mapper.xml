@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="File">
+
+	<sql id="selectFileInfoSql">
+			/* tbsy_file_info[[SY][시스템] 첨부파일정보] SELECT */
+			SELECT tb1.seq            /* 일련번호                     BIGINT       */
+			     , tb1.mb_id          /* 회사코드                     VARCHAR(20)  */
+			     , tb1.file_no        /* 파일번호                     VARCHAR(40)  */
+			     , tb1.attach_gbn     /* 첨부구분                     VARCHAR(10)  */
+			     , tb2.cd_vl_nm AS attach_gbn_nm
+			     , tb1.board_no       /* 게시판구분 게시판번호          VARCHAR(20)  */
+			     , tb1.ref_seq        /* 첨부구분 해당테이블의 인덱스 VARCHAR(20)  */
+			     , tb1.doc_gbn	      /* 문서구분                     VARCHAR(10)  */
+			     , tb1.file_path      /* 파일경로(절대경로)           VARCHAR(300) */
+			     , tb1.file_url       /* 파일URL(상대경로)            VARCHAR(300) */
+			     , tb1.file_nm        /* 원파일명                     VARCHAR(300) */
+			     , tb1.file_size      /* 파일크기                     BIGINT       */
+			     , tb1.file_mime      /* MIME타입                     VARCHAR(100) */
+			     , tb1.file_format    /* 확장자                       VARCHAR(5)   */
+			     , tb1.memo           /* 메모                         VARCHAR(100) */
+			     , tb1.in_emp_cd      /* 입력자사번                   VARCHAR(20)  */
+			     , DATE_FORMAT(tb1.in_dtm, '%Y-%m-%d') AS in_dtm         /* 입력일시                     DATETIME     */
+			     , tb1.up_emp_cd      /* 수정자사번                   VARCHAR(20)  */
+			     , DATE_FORMAT(tb1.up_dtm, '%Y-%m-%d') AS up_dtm         /* 수정일시                     DATETIME     */
+			  FROM (SELECT * FROM tbsy_file_info
+			 		 WHERE mb_id = #{mb_id}
+						<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(file_no)'> 
+						   AND file_no = #{file_no}
+						</if>
+						<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(seq)'> 
+						   AND seq = #{seq}
+						</if>
+						<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(attach_gbn)'>
+						   AND attach_gbn = #{attach_gbn}
+						</if>
+						<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(ref_seq)'>
+						   AND ref_seq = #{ref_seq}
+						</if>
+						<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(board_no)'>
+						   AND board_no = #{board_no}
+						</if>
+						<if test="@kr.co.gnx.comm.util.CommUtil@isNotEmpty(file_mime)">
+						   AND file_mime LIKE CONCAT('%',#{file_mime},'%')
+						</if>
+						) tb1
+   LEFT OUTER JOIN (SELECT * FROM tbcm_common_code WHERE mb_id = #{mb_id} AND grp_cmm_cd = 'ATTACH_GBN' ) tb2
+   				ON tb1.attach_gbn = tb2.cd_vl
+
+	</sql>
+	
+	<select id="selectFileInfoList" parameterType="kr.co.gnx.system.file.FileVO" resultType="kr.co.gnx.system.file.FileVO">
+		/* file-mapper.xml id="selectFileInfoList" 파일정보 조회 */
+		<include refid="selectFileInfoSql"/>
+		ORDER BY seq DESC
+	</select>
+	
+	<select id="selectFileInfoView" parameterType="kr.co.gnx.system.file.FileVO" resultType="kr.co.gnx.system.file.FileVO">
+		/* file-mapper.xml id="selectFileInfoView" 파일정보 상세 조회 */
+		<include refid="selectFileInfoSql"/>
+	</select>
+	<!-- 첨부파일정보 중복 조회 -->
+	<select id="selectFileInfoCount" parameterType="kr.co.gnx.system.file.FileVO" resultType="java.lang.Integer">
+		/* file-mapper.xml selectFileInfoCount 첨부파일정보 중복 확인(개수조회) */
+		SELECT COUNT(file_no) FROM tbsy_file_info 
+		 WHERE file_no   = #{file_no}
+		   AND mb_id     = #{mb_id}
+	</select>
+	
+	<insert id="insertFileInfo" parameterType="kr.co.gnx.system.file.FileVO">
+		/* file-mapper.xml insertFileInfo 첨부파일정보 입력 */
+		INSERT
+		  INTO tbsy_file_info /* [SY][시스템] 첨부파일정보 - seq는 MySQL AUTO_INCREMENT(원본은 Oracle 시퀀스) */
+		     ( mb_id          /* 회사코드                     VARCHAR(20)  */
+		     , file_no        /* 파일번호                     VARCHAR(40)  */
+		     , attach_gbn     /* 첨부구분                     VARCHAR(10)  */
+     		 , board_no       /* 게시판구분 게시판번호          VARCHAR(20)  */
+		     , ref_seq        /* 첨부구분 해당테이블의 인덱스 VARCHAR(20)  */
+		     , doc_gbn     	  /* 문서구분                     VARCHAR(10)  */
+		     , file_path      /* 파일경로(절대경로)           VARCHAR(300) */
+		     , file_url       /* 파일URL(상대경로)            VARCHAR(300) */
+		     , file_nm        /* 원파일명                     VARCHAR(300) */
+		     , file_size      /* 파일크기                     BIGINT       */
+		     , file_mime      /* MIME타입                     VARCHAR(100) */
+		     , file_format    /* 확장자                       VARCHAR(5)   */
+		     , memo           /* 메모                         VARCHAR(100) */
+		     , in_emp_cd      /* 입력자사번                   VARCHAR(20)  */
+		     , in_dtm         /* 입력일시                     DATETIME     */
+		     , up_emp_cd      /* 수정자사번                   VARCHAR(20)  */
+		     , up_dtm         /* 수정일시                     DATETIME     */
+		     )
+		VALUES
+		     ( #{mb_id}         /* 회사코드                     VARCHAR(20)  */
+		     , #{file_no}       /* 파일번호                     VARCHAR(40)  */
+		     , #{attach_gbn}    /* 첨부구분                     VARCHAR(10)  */
+     		 , #{board_no}      /* 게시판구분 게시판번호          VARCHAR(20)  */
+		     , #{ref_seq}       /* 첨부구분 해당테이블의 인덱스 VARCHAR(20)  */
+		     , #{doc_gbn}     	/* 문서구분                     VARCHAR(10)  */
+		     , #{file_path}     /* 파일경로(절대경로)           VARCHAR(300) */
+		     , #{file_url}      /* 파일URL(상대경로)            VARCHAR(300) */
+		     , #{file_nm}       /* 원파일명                     VARCHAR(300) */
+		     , #{file_size}     /* 파일크기                     BIGINT       */
+		     , #{file_mime}     /* MIME타입                     VARCHAR(100) */
+		     , #{file_format}   /* 확장자                       VARCHAR(5)   */
+		     , #{memo}          /* 메모                         VARCHAR(100) */
+		     , #{in_emp_cd}     /* 입력자사번                   VARCHAR(20)  */
+		     , NOW()        	/* 입력일시                     DATETIME     */
+		     , null     		/* 수정자사번                   VARCHAR(20)  */
+		     , null        		/* 수정일시                     DATETIME     */
+		     )
+	</insert>
+	
+	
+	<!-- 첨부파일정보 수정 -->
+	<update id="updateFileInfo" parameterType="kr.co.gnx.system.file.FileVO" >
+		/* file-mapper.xml updateFileInfo 첨부파일정보 수정 */
+		UPDATE tbsy_file_info /* [SY][시스템] 첨부파일정보 */
+		   SET up_emp_cd   = #{up_emp_cd}      /* 수정자사번                   VARCHAR(20)  */
+		     , up_dtm      = NOW()         /* 수정일시                     DATETIME     */
+		     <if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(attach_gbn)'>
+		     	, attach_gbn = #{attach_gbn}     /* 첨부구분                     VARCHAR(10)  */
+		     </if>
+		     <if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(board_no)'>
+     			, board_no    = #{board_no}       /* 게시판구분 게시판번호          VARCHAR(20)  */
+		     </if>
+		     <if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(ref_seq)'>
+		     	, ref_seq = #{ref_seq}        /* 첨부구분 해당테이블의 인덱스 VARCHAR(20)  */
+		     </if>
+		     <if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(file_path)'>
+		     	, file_path = #{file_path}      /* 파일경로(절대경로)           VARCHAR(300) */
+		     </if>
+		     <if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(file_url)'>
+		     	, file_url = #{file_url}       /* 파일URL(상대경로)            VARCHAR(300) */
+		     </if>
+		     <if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(file_nm)'>
+		     	, file_nm = #{file_nm}        /* 원파일명                     VARCHAR(300) */
+		     </if>
+		     <if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(file_size)'>
+		     	, file_size = #{file_size}      /* 파일크기                     BIGINT       */
+		     </if>
+		     <if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(file_mime)'>
+		     	, file_mime = #{file_mime}      /* MIME타입                     VARCHAR(100) */
+		     </if>
+		     <if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(file_format)'>
+		     	, file_format = #{file_format}    /* 확장자                       VARCHAR(5)   */
+		     </if>
+		     <if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(memo)'>
+		     	, memo = #{memo}           /* 메모                         VARCHAR(100) */
+		     </if>
+		 WHERE mb_id = #{mb_id}
+		   AND file_no = #{file_no}
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(seq)'>
+				AND seq = #{seq}			/* 일련번호                     BIGINT       */
+			</if>
+	</update>
+	
+	<delete id="deleteFileInfo" parameterType="kr.co.gnx.system.file.FileVO">
+		/* file-mapper.xml deleteFileInfo 첨부파일정보(file_no) 삭제 */
+		DELETE
+		  FROM tbsy_file_info
+		 WHERE mb_id = #{mb_id}
+		   AND file_no = #{file_no}
+	</delete>
+	
+	<delete id="deleteFileInfoByRefIdx" parameterType="kr.co.gnx.system.file.FileVO">
+		/* file-mapper.xml "deleteFileInfoByRefIdx" 첨부파일정보(ref_seq) 삭제 */
+		DELETE
+		  FROM tbsy_file_info
+		 WHERE mb_id = #{mb_id}
+		   AND attach_gbn = #{attach_gbn}
+		   AND ref_seq = #{ref_seq}
+	</delete>
+	
+	<insert id="insertFileInfoCopy" parameterType="kr.co.gnx.system.file.FileVO">
+		/* file-mapper.xml insertFileInfoCopy 첨부파일정보 복사(게시글복사) */
+		INSERT
+		  INTO tbsy_file_info /* [SY][시스템] 첨부파일정보 - seq는 MySQL AUTO_INCREMENT(원본은 Oracle 시퀀스) */
+		     ( mb_id          /* 회사코드                     VARCHAR(20)  */
+		     , file_no        /* 파일번호                     VARCHAR(40)  */
+		     , attach_gbn     /* 첨부구분                     VARCHAR(10)  */
+     		 , board_no       /* 게시판구분 게시판번호          VARCHAR(20)  */
+		     , ref_seq        /* 첨부구분 해당테이블의 인덱스 VARCHAR(20)  */
+		     , doc_gbn     	  /* 문서구분                     VARCHAR(10)  */
+		     , file_path      /* 파일경로(절대경로)           VARCHAR(300) */
+		     , file_url       /* 파일URL(상대경로)            VARCHAR(300) */
+		     , file_nm        /* 원파일명                     VARCHAR(300) */
+		     , file_size      /* 파일크기                     BIGINT       */
+		     , file_mime      /* MIME타입                     VARCHAR(100) */
+		     , file_format    /* 확장자                       VARCHAR(5)   */
+		     , memo           /* 메모                         VARCHAR(100) */
+		     , in_emp_cd      /* 입력자사번                   VARCHAR(20)  */
+		     , in_dtm         /* 입력일시                     DATETIME     */
+		     , up_emp_cd      /* 수정자사번                   VARCHAR(20)  */
+		     , up_dtm         /* 수정일시                     DATETIME     */
+		     )
+		SELECT mb_id         /* 회사코드                     VARCHAR(20)  */
+		     , file_no       /* 파일번호                     VARCHAR(40)  */
+		     , attach_gbn    /* 첨부구분                     VARCHAR(10)  */
+     		 , #{board_no}   /* 게시판구분 게시판번호          VARCHAR(20)  */
+		     , #{KEYID}    /* 첨부구분 해당테이블의 인덱스 VARCHAR(20)  */
+		     , doc_gbn     	 /* 문서구분                     VARCHAR(10)  */
+		     , file_path     /* 파일경로(절대경로)           VARCHAR(300) */
+		     , file_url      /* 파일URL(상대경로)            VARCHAR(300) */
+		     , file_nm       /* 원파일명                     VARCHAR(300) */
+		     , file_size     /* 파일크기                     BIGINT       */
+		     , file_mime     /* MIME타입                     VARCHAR(100) */
+		     , file_format   /* 확장자                       VARCHAR(5)   */
+		     , memo          /* 메모                         VARCHAR(100) */
+		     , in_emp_cd     /* 입력자사번                   VARCHAR(20)  */
+		     , NOW()         /* 입력일시                     DATETIME     */
+		     , null    		 /* 수정자사번                   VARCHAR(20)  */
+		     , null       	 /* 수정일시                     DATETIME     */
+		 FROM tbsy_file_info
+	  WHERE mb_id = #{mb_id}
+	    AND attach_gbn = #{attach_gbn}
+	    AND ref_seq = #{ref_seq}
+	</insert>
+	
+	<!-- 게시물이동시 파일도 이동 -->
+	<update id="updateBoardFileInfo" parameterType="kr.co.gnx.system.file.FileVO" >
+		/* file-mapper.xml updateBoardFileInfo 게시물이동시 파일 수정 */
+		UPDATE tbsy_file_info /* [SY][시스템] 첨부파일정보 */
+		   SET up_emp_cd   = #{up_emp_cd}      /* 수정자사번                   VARCHAR(20)  */
+		     , up_dtm      = NOW()         /* 수정일시                     DATETIME     */
+    		 , board_no    = #{board_no}       /* 게시판구분 게시판번호          VARCHAR(20)  */
+		 WHERE mb_id = #{mb_id}
+	    	AND attach_gbn = #{attach_gbn}
+	    	AND ref_seq = #{ref_seq}
+	</update>
+	
+	<select id="selectTempFileInfoList" parameterType="kr.co.gnx.system.file.FileVO" resultType="kr.co.gnx.system.file.FileVO">
+		/* file-mapper.xml id="selectTempFileInfoList" 임시파일정보 조회 */
+		SELECT file_path
+		  FROM tbsy_file_info
+		 WHERE mb_id = #{mb_id}
+		   AND attach_gbn = #{attach_gbn}
+		   AND memo = #{memo}
+	</select>
+	
+	<delete id="deleteTempFileInfo" parameterType="kr.co.gnx.system.file.FileVO">
+		/* file-mapper.xml deleteTempFileInfo 임시파일정보 삭제 */
+		DELETE
+		  FROM tbsy_file_info
+		 WHERE mb_id = #{mb_id}
+		   AND attach_gbn = #{attach_gbn}
+		   AND memo = #{memo}
+	</delete>
+	
+	<update id="updateTempFileInfo" parameterType="kr.co.gnx.system.file.FileVO">
+		/* file-mapper.xml updateTempFileInfo 임시파일정보 수정 */
+		UPDATE tbsy_file_info
+		   SET memo = ''
+		     , ref_seq = #{ref_seq}
+		 WHERE mb_id = #{mb_id}
+		   AND attach_gbn = #{attach_gbn}
+		   AND memo = #{memo}
+	</update>
+	
+</mapper>

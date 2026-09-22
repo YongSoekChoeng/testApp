@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CommonCode">
+	<select id="SelectCommonCodeList" resultType="kr.co.gnx.system.commoncode.CommonCodeVO" parameterType="kr.co.gnx.system.commoncode.CommonCodeVO">
+		/* SelectCommonCodeList commoncode-mapper.xml */
+		SELECT grp_cmm_cd    /* 그룹공통코드 VARCHAR(100) */
+		     , cd_vl         /* 코드값       VARCHAR(100) */
+		     , cd_vl_nm      /* 코드값명     VARCHAR(150) */
+		     , use_yn        /* 사용여부     VARCHAR(2)   */
+		     , sort_no       /* 정렬순서     BIGINT       */
+		     , in_emp_cd     /* 입력자       VARCHAR(20)  */
+		     , in_dtm        /* 입력일시     DATETIME     */
+		     , up_emp_cd     /* 수정자       VARCHAR(20)  */
+		     , up_dtm        /* 수정일시     DATETIME     */
+		  FROM tbcm_common_code
+		 WHERE mb_id = #{mb_id}
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(use_yn)'>
+				AND use_yn = #{use_yn}
+			</if>
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(cd_vl_arr)'>
+				AND UPPER(cd_vl) IN <foreach collection="cd_vl_arr"  item="item" open="("  separator="," close=")"><![CDATA[  UPPER(#{item}) ]]></foreach>
+			</if>
+			<if test='@kr.co.gnx.comm.util.CommUtil@isEmpty(grp_cmm_cd_arr)'>	
+		   		AND UPPER(grp_cmm_cd) =<![CDATA[  UPPER(#{grp_cmm_cd}) ]]>
+			</if>
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(grp_cmm_cd_arr)'>
+				AND UPPER(grp_cmm_cd) IN <foreach collection="grp_cmm_cd_arr"  item="item" open="("  separator="," close=")"><![CDATA[  UPPER(#{item}) ]]></foreach>
+			</if>
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(con)'>
+				AND SUBSTRING(cd_vl,1,1) = #{con}
+			</if>
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(search_word)'>
+				AND cd_vl != #{search_word}
+			</if>
+	  ORDER BY sort_no
+	</select>
+
+	<select id="selectCommonCodeGroupList" parameterType="kr.co.gnx.system.commoncode.CommonCodeVO" resultType="bmap">
+		/* commoncode-mapper.xml id="selectCommonCodeGroupList" 공통코드 그룹 리스트 조회 */
+		SELECT mb_id              /* 회사코드 varchar(20)*/
+			 , grp_cmm_cd         /* 그룹공통코드 varchar(100)*/
+			 , grp_cmm_cd_nm      /* 그룹공통코드명 varchar(150)*/
+			 , grp_cmm_cd_desc    /* 그룹공통코드명 varchar(300)*/
+			 , system_gubun       /* 시스템 구분 varchar(10)*/
+			 , sort_no            /* 정렬순서 bigint(20)*/
+		  FROM tbcm_common_code_group
+		 WHERE mb_id = #{mb_id}
+		 <if test="@kr.co.gnx.comm.util.CommUtil@isNotEmpty(search_word)">
+		   AND (UPPER(grp_cmm_cd) LIKE CONCAT('%',UPPER(#{search_word}),'%') OR UPPER(grp_cmm_cd_nm) LIKE CONCAT('%',UPPER(#{search_word}),'%'))
+		 </if>
+		 ORDER BY sort_no DESC
+	</select>
+	
+		
+	<select id="selectAgeAmtView" parameterType="kr.co.gnx.system.commoncode.CommonCodeVO" resultType="bmap">
+		/* commoncode-mapper.xml id="selectAgeAmtView" 연령별 기준금액 초과계약 연령별 기준금액설정 조회 */
+		SELECT tb2.cd_vl AS exceeded_prem_amt20
+		     , tb3.cd_vl AS exceeded_prem_amt30
+		     , tb4.cd_vl AS exceeded_prem_amt40
+		     , tb5.cd_vl AS exceeded_prem_amt50
+		     , tb6.cd_vl AS exceeded_prem_amt60
+		  FROM (SELECT 1) tb1
+		LEFT OUTER JOIN (SELECT * FROM tbcm_common_code WHERE mb_id = #{mb_id} AND grp_cmm_cd = 'EXCEEDED_PREM_AMT20') tb2
+		ON 1 = 1
+		LEFT OUTER JOIN (SELECT * FROM tbcm_common_code WHERE mb_id = #{mb_id} AND grp_cmm_cd = 'EXCEEDED_PREM_AMT30') tb3
+		ON 1 = 1
+		LEFT OUTER JOIN (SELECT * FROM tbcm_common_code WHERE mb_id = #{mb_id} AND grp_cmm_cd = 'EXCEEDED_PREM_AMT40') tb4
+		ON 1 = 1
+		LEFT OUTER JOIN (SELECT * FROM tbcm_common_code WHERE mb_id = #{mb_id} AND grp_cmm_cd = 'EXCEEDED_PREM_AMT50') tb5
+		ON 1 = 1
+		LEFT OUTER JOIN (SELECT * FROM tbcm_common_code WHERE mb_id = #{mb_id} AND grp_cmm_cd = 'EXCEEDED_PREM_AMT60') tb6
+		ON 1 = 1
+	</select>
+	
+	<update id="updateCommonCodeValue" parameterType="kr.co.gnx.system.commoncode.CommonCodeVO">
+		/* commoncode-mapper.xml id="updateCommonCodeValue" 공통 코드 수정(cd_vl 수정가능) */
+		UPDATE tbcm_common_code
+		  SET up_emp_cd = #{up_emp_cd}
+		  	, up_dtm = NOW()
+		  	<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(cd_vl)'>
+		  	, cd_vl = #{cd_vl}
+		  	</if>
+		  	<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(cd_vl_nm)'>
+		  	, cd_vl_nm = #{cd_vl_nm}
+		  	</if>
+		  	<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(use_yn)'>
+		  	, use_yn = #{use_yn}
+		  	</if>
+		  	<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(sort_no)'>
+		  	, sort_no = #{sort_no}
+		  	</if>
+		 WHERE mb_id = #{mb_id}
+		   AND grp_cmm_cd = #{grp_cmm_cd}
+	</update>
+	
+	<insert id="insertCommonCodeGroup" parameterType="kr.co.gnx.system.commoncode.CommonCodeVO">
+		<selectKey keyProperty="sort_no" order="BEFORE" resultType="String">
+			SELECT IFNULL(MAX(sort_no), 0) + 10 AS sort_no FROM tbcm_common_code_group WHERE mb_id = #{mb_id}
+		</selectKey>
+	
+		/* commoncode-mapper.xml id="insertCommonCodeGroup" 공통코드 그룹 입력 */
+		INSERT
+		  INTO tbcm_common_code_group
+		  	 ( mb_id             /* 회사코드 varchar(20)*/
+			 , grp_cmm_cd        /* 그룹공통코드 varchar(100)*/
+			 , grp_cmm_cd_nm     /* 그룹공통코드명 varchar(150)*/
+			 , grp_cmm_cd_desc   /* 그룹공통코드명 varchar(300)*/
+			 , system_gubun      /* 시스템 구분 varchar(10)*/
+			 , sort_no           /* 정렬순서 bigint(20)*/
+			 , in_emp_cd         /* 입력자사번 varchar(20)*/
+			 , in_dtm            /* 입력일시 datetime*/
+		  	 )
+		VALUES
+			 ( #{mb_id}
+			 , UPPER(#{grp_cmm_cd})
+			 , #{grp_cmm_cd_nm}
+			 , #{grp_cmm_cd_desc}
+			 , #{system_gubun}
+			 , #{sort_no}
+			 , #{in_emp_cd}
+			 , NOW()
+			 )
+	</insert>
+	
+	<update id="updateCommonCodeGroup" parameterType="kr.co.gnx.system.commoncode.CommonCodeVO">
+		/* commoncode-mapper.xml id="updateCommonCodeGroup" 공통코드그룹 수정 */
+		UPDATE tbcm_common_code_group
+		   SET grp_cmm_cd_nm = #{grp_cmm_cd_nm}
+		   	 , grp_cmm_cd_desc = #{grp_cmm_cd_desc}
+		   	 , up_emp_cd = #{up_emp_cd}
+		   	 , up_dtm = NOW()
+		 WHERE grp_cmm_cd = #{grp_cmm_cd}
+	</update>
+	
+	<delete id="deleteCommonCodeGroup" parameterType="kr.co.gnx.system.commoncode.CommonCodeVO">
+		/* commoncode-mapper.xml id="deleteCommonCodeGroup" 공통코드그룹 삭제 */
+		DELETE
+		  FROM tbcm_common_code_group
+		 WHERE mb_id = #{mb_id}
+		   AND grp_cmm_cd = #{grp_cmm_cd}
+	</delete>
+	
+	<insert id="insertCommonCode" parameterType="kr.co.gnx.system.commoncode.CommonCodeVO">
+		/* commoncode-mapper.xml id="insertCommonCode" 공통코드 입력 */
+		INSERT
+		  INTO tbcm_common_code
+		  	 ( mb_id           /* 회사코드 varchar(20)*/
+			 , grp_cmm_cd    /* 그룹공통코드 varchar(100)*/
+			 , cd_vl         /* 코드값 varchar(100)*/
+			 , cd_vl_nm      /* 코드값명 varchar(150)*/
+			 , use_yn        /* 사용여부 varchar(2)*/
+			 , sort_no       /* 정렬순서 bigint(20)*/
+			 , in_emp_cd     /* 입력자 varchar(20)*/
+			 , in_dtm        /* 입력일시 datetime*/
+		  	 )
+		VALUES
+			 ( #{mb_id}
+			 , #{grp_cmm_cd}
+			 , #{cd_vl}
+			 , #{cd_vl_nm}
+			 , #{use_yn}
+			 , #{sort_no}
+			 , #{in_emp_cd}
+			 , NOW()
+			 )
+	</insert>
+	
+	<update id="updateCommonCode" parameterType="kr.co.gnx.system.commoncode.CommonCodeVO">
+		/* commoncode-mapper.xml id="updateCommonCode" 공통 코드 수정 */
+		UPDATE tbcm_common_code
+		  SET up_emp_cd = #{up_emp_cd}
+		  	, up_dtm = NOW()
+		  	, cd_vl_nm = #{cd_vl_nm}
+		  	, use_yn = #{use_yn}
+		  	, sort_no = #{sort_no}
+		 WHERE mb_id = #{mb_id}
+		   AND grp_cmm_cd = #{grp_cmm_cd}
+		   AND cd_vl = #{cd_vl}
+	</update>
+	
+	<delete id="deleteCommonCode" parameterType="kr.co.gnx.system.commoncode.CommonCodeVO">
+		/* commoncode-mapper.xml id="deleteCommonCode" 공통코드 삭제 */
+		DELETE
+		  FROM tbcm_common_code
+		 WHERE mb_id = #{mb_id}
+		   AND grp_cmm_cd = #{grp_cmm_cd}
+		<if test="@kr.co.gnx.comm.util.CommUtil@isNotEmpty(cd_vl)">
+		   AND cd_vl = #{cd_vl}
+		</if>
+	</delete>
+	
+	<select id="selectCommonCodeView" resultType="kr.co.gnx.system.commoncode.CommonCodeVO" parameterType="kr.co.gnx.system.commoncode.CommonCodeVO">
+		/* selectCommonCodeView commoncode-mapper.xml */
+		SELECT grp_cmm_cd    /* 그룹공통코드 VARCHAR(100) */
+		     , cd_vl         /* 코드값       VARCHAR(100) */
+		     , cd_vl_nm      /* 코드값명     VARCHAR(150) */
+		     , use_yn        /* 사용여부     VARCHAR(2)   */
+		     , sort_no       /* 정렬순서     BIGINT       */
+		     , in_emp_cd     /* 입력자       VARCHAR(20)  */
+		     , in_dtm        /* 입력일시     DATETIME     */
+		     , up_emp_cd     /* 수정자       VARCHAR(20)  */
+		     , up_dtm        /* 수정일시     DATETIME     */
+		  FROM tbcm_common_code
+		 WHERE mb_id = #{mb_id}
+		<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(use_yn)'>
+		   AND use_yn = #{use_yn}
+		</if>			
+		<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(cd_vl)'>
+		   AND UPPER(cd_vl) = UPPER(#{cd_vl})
+		</if>
+		<if test='@kr.co.gnx.comm.util.CommUtil@isEmpty(grp_cmm_cd)'>	
+	   	   AND UPPER(grp_cmm_cd) = UPPER(#{grp_cmm_cd})
+		</if>
+		 LIMIT 0, 1
+	</select>
+</mapper>

@@ -1,0 +1,1980 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Erp">
+    <!--****************************************** ERP 데이터 가져오는 부분 START ******************************************-->
+    <select id="selectErpMemberList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpMemberList" ERP 회원사 데이터 가져오기 */
+        SELECT mb_id
+             , mb_nm
+             , mb_login_id
+             , copy_mb_id
+             , zipcd
+             , addr1
+             , addr2
+             , mb_type
+             , use_yn
+             , cont_frymd
+             , cont_toymd
+             , corp_reg_num
+             , tax_reg_num
+             , corp_email
+             , represent_nm
+             , telno
+             , faxno
+             , domain_url
+             , domain_mng
+             , domain_id
+             , domain_pw
+             , ci_url
+             , logo_url
+             , manager_nm
+             , mtelno
+             , pkg_name
+             , copy_right
+             , certlogo_url
+             , seal_url
+             , certificate_mb_nm
+             , sort_no
+             , memo
+             , bigo
+             , secret_key
+             , iv
+             , sso_use_yn
+             , erp_sync_url
+             , session_time
+             , mb_api_id
+             , mb_api_pwd
+          FROM tbsy_member
+         WHERE mb_id IN (<include refid="Comm.MemberExcepcion" />)
+    </select>
+    
+    <select id="selectErpCommonCodeGroupList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpCommonCodeGroupList" 공통코드그룹 데이터 가져오기 */
+        SELECT mb_id
+             , grp_cmm_cd
+             , grp_cmm_cd_nm
+             , grp_cmm_cd_desc
+             , system_gubun
+             , sort_no
+          FROM tbcm_common_code_group
+         WHERE mb_id = #{mb_id}
+           AND system_gubun = 'COMMON'
+    </select>
+    
+    <select id="selectErpCommonCodeList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpCommonCodeList" ERP 공통코드 데이터 가져오기 */
+        SELECT tb1.mb_id
+             , tb1.grp_cmm_cd
+             , tb1.cd_vl
+             , tb1.cd_vl_nm
+             , tb1.use_yn
+             , tb1.sort_no
+          FROM tbcm_common_code tb1
+          JOIN tbcm_common_code_group tb2
+            ON tb1.mb_id = tb2.mb_id
+           AND tb1.grp_cmm_cd = tb2.grp_cmm_cd
+         WHERE tb1.mb_id = #{mb_id}
+           AND tb2.system_gubun = 'COMMON'
+         ORDER BY tb2.sort_no, tb2.sort_no
+    </select>
+    
+    <select id="selectErpInscoList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpInscoList" ERP 보험사 데이터 가져오기 */
+        SELECT mb_id
+             , insco_cd
+             , insco_nm
+             , insco_type
+             , use_yn
+             , sort_no
+             , memo
+          FROM tbcm_insco
+         WHERE mb_id = #{mb_id}
+    </select>
+    
+    <select id="selectErpOrgList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpOrgList" ERP 조직 데이터 가져오기 */
+        SELECT mb_id
+             , scd
+             , snm
+             , pscd
+             , org_unit_gbn
+             , org_strt_ymd
+             , org_end_ymd
+             , scd_head
+             , telno
+             , faxno
+             , zipcd
+             , addr1
+             , addr2
+             , org_mng_gbn
+             , use_yn
+             , sort_no
+          FROM tbin_scd
+         WHERE mb_id = #{mb_id}
+    </select>
+    
+    <select id="selectErpMonthOrgList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpMonthOrgList" ERP 월별 조직 데이터 가져오기 */
+        SELECT mb_id
+             , com_ym
+             , scd
+             , snm
+             , pscd
+             , org_unit_gbn
+             , org_strt_ymd
+             , org_end_ymd
+             , scd_head
+             , org_mng_gbn
+             , use_yn
+             , sort_no
+          FROM tbin_scd_month
+         WHERE mb_id = #{mb_id}
+           AND com_ym = #{com_ym}
+    </select>
+    
+    <select id="selectErpEmpList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpEmpList" ERP 인사데이터 가져오기(신규입사자) */
+        SELECT mb_id
+             , emp_cd
+             , before_emp_cd
+             , emp_nm
+             , emp_nme
+             , scd
+             , perno
+             , jikgub
+             , jikchk
+             , telno
+             , hpno
+             , extno
+             , email
+             , zipcd
+             , addr1
+             , addr2
+             , empsta
+             , insco_emp_cd_gbn
+             , join_gbn
+             , pay_gbn
+             , rcrt_type
+             , re_emp_cd
+             , lreg_ymd
+             , nreg_ymd
+             , vreg_ymd
+             , vreg_no
+             , areg_no
+             , career_gbn
+             , ent_ymd
+             , gent_ymd
+             , end_ymd
+             , out_ymd
+             , bank
+             , bk_id
+             , owner
+             , owner_relation
+             , memo
+          FROM v_tbin_empmst
+         WHERE mb_id = #{mb_id}
+           AND emp_cd NOT IN ('SADMIN', 'ADMIN', 'RPA')
+           <!-- AND pay_gbn != "정규직" -->
+    </select>
+    
+    <select id="selectErpMonthEmpList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpMonthEmpList" ERP 월별 인사 가져오기 */
+        SELECT mb_id
+             , com_ym
+             , emp_cd
+             , emp_nm
+             , scd
+             , jikgub
+             , jikchk
+             , empsta
+             , join_gbn
+             , pay_gbn
+             , re_emp_cd
+             , career_gbn
+             , ent_ymd
+             , gent_ymd 
+             , end_ymd
+             , out_ymd
+             , bank
+             , bk_id
+             , owner
+             , owner_relation
+             , NULL AS gain_ymd
+             , NULL AS lost_ymd
+             , before_emp_cd
+             , IFNULL(gent_chawol, 0) AS gent_chawol
+             , IFNULL(jikchk_chawol, 0) AS jikchk_chawol
+             , IFNULL(jikchk_change_chawol, 0) AS jikchk_change_chawol
+          FROM v_tbin_emp_month
+         WHERE mb_id = #{mb_id}
+           AND com_ym = #{com_ym}
+           AND emp_cd NOT IN ('SADMIN', 'ADMIN', 'RPA')
+           AND pay_gbn != "정규직"
+    </select>
+    
+    <select id="selectErpLoginList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpLoginList" ERP 로그인 정보 가져오기 */
+        SELECT mb_id               /* 회사코드 varchar(20)*/
+             , login_id            /* 사용자 ID varchar(20)*/
+             , emp_cd              /* 사번 varchar(20)*/
+             , pwd_intzn_type      /* 비밀번호초기화여부 varchar(1)*/
+             , acct_lock_type      /* 계정잠김여부 varchar(1)*/
+             , login_autr_type     /*  varchar(20)*/
+             , user_pwd            /* 사용자 비밀번호 varchar(430)*/
+             , trns_user_pwd       /* 임시 비빌번호 varchar(430)*/
+             , pwd_err_nbtm        /* 비밀번호 오류횟수 bigint(20)*/
+             , pwd_chg_dt          /* 비밀번호 변경일자 varchar(8)*/
+             , memo                /* 메모 varchar(200)*/
+          FROM tbsy_login
+         WHERE mb_id = #{mb_id}
+    </select>
+    
+    <select id="selectErpEmpcodeList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpEmpcodeList" ERP 사용인코드 가져오기 */
+        SELECT tb1.mb_id
+             , #{com_ym} AS com_ym
+             , tb1.insco_cd
+             , tb1.emp_cd
+             , CASE
+             	   WHEN tb1.insco_cd = 'L25' THEN TRIM(LEADING '0' FROM tb1.insco_emp_cd)	/* 삼성생명 앞 '0' 제거 */
+             	   ELSE tb1.insco_emp_cd
+               END AS insco_emp_cd
+             , tb1.insco_emp_cd_gbn
+             , tb1.coent_ymd
+             , tb1.coend_ymd
+          FROM tbin_empcode tb1
+         WHERE tb1.mb_id = #{mb_id}
+           AND IFNULL(tb1.insco_emp_cd, '') != ''
+           AND tb1.insco_emp_cd NOT REGEXP '[가-힣]'
+         ORDER BY tb1.insco_emp_cd
+    </select>
+    
+    <select id="selectErpEmpGuaranteeList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpEmpGuaranteeList" 보증정보 가져오기 */
+        SELECT mb_id
+             , #{com_ym} AS com_ym
+             , emp_cd
+             , bond_gbn
+             , bond_type
+             , bond_cont_status
+             , bond_cont_gbn
+             , stock_no
+             , join_amt
+             , join_ymd
+             , chg_ymd
+             , end_ymd
+             , inc_ymd
+             , memo
+          FROM tbin_empguarantee_sec
+         WHERE mb_id = #{mb_id}
+           AND bond_gbn != '신원보증'	/* 신원보증은 수수료에 잡히면 안됨 */
+           AND bond_cont_status	= '정상'
+           AND SUBSTR(REPLACE(end_ymd, '-', ''), 1,6) > #{com_ym}
+         UNION ALL
+		SELECT mb_id
+		     , #{com_ym} AS com_ym
+		     , emp_cd
+		     , bond_gbn
+		     , bond_type
+		     , bond_cont_status
+		     , bond_cont_gbn
+		     , stock_no
+		     , join_amt
+		     , join_ymd
+		     , chg_ymd
+		     , end_ymd
+		     , inc_ymd
+		     , memo
+		  FROM tbin_empguarantee_etc
+		  WHERE mb_id = #{mb_id}
+		    AND bond_gbn IN ('100', '101')  /* 수수료,지원금인 경우만 수수료에 잡히도록 */
+		    AND bond_cont_status	= '정상'
+		    AND SUBSTR(REPLACE(end_ymd, '-', ''), 1,6) > #{com_ym}
+    </select>
+    
+    <select id="selectErpContractList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpContractList" 계약데이터 가져오기 */
+        SELECT tb1.mb_id 
+             , #{com_ym} AS com_ym
+             , tb1.insco_cd
+             , tb1.inspol_no
+             , tb1.cont_date
+             , tb1.mo_cd
+             , tb1.policyholder
+             , tb1.insured
+             , tb1.ins_cont_type
+             , tb1.prod_kind1
+             , tb1.prod_kind2
+             , tb1.prod_nm
+             , IFNULL(tb1.main_contract_amt, 0) AS main_contract_amt
+             , IFNULL(tb1.prem_amt, 0) AS prem_amt
+             , IFNULL(tb1.dsnt_amt, 0) AS dsnt_amt
+             , IFNULL(tb1.month_prem_amt, 0) AS month_prem_amt
+             , tb1.napmethod
+			 , tb1.napgi
+			 , tb1.napgi_gbn
+			 , tb1.insu_strt_date
+			 , tb1.insu_end_date
+			 , IFNULL(tb1.term_insured, 0) AS term_insured
+			 , tb1.term_insured_gbn
+			 , IFNULL(tb1.insco_hwan, 0) AS insco_hwan
+			 , IFNULL(tb1.insco_hwan_2, 0) AS insco_hwan_2
+			 , IFNULL(tb1.insco_hwan_3, 0) AS insco_hwan_3
+			 , IFNULL(tb1.usi_insco_hwan, 0) AS usi_insco_hwan
+			 <!-- , IFNULL(tb1.hwan_rate, 0) AS hwan_rate -->
+			 , IFNULL(IFNULL(tb4.byenhwan_rate, tb1.hwan_rate), 0) AS hwan_rate 
+			 , IFNULL(tb1.hwan, 0) AS hwan
+			 , IFNULL(tb1.usi_hwan, 0) AS usi_hwan
+			 , IFNULL(tb1.hyo_hwan, 0) AS hyo_hwan
+			 , IFNULL(tb1.hyo_byenhwan_rate, 0) AS hyo_byenhwan_rate
+			 , tb1.byenhwan_rate_gbn
+			 , IFNULL(tb1.napcnt, 0) AS napcnt
+			 , tb1.cont_status
+			 , tb1.cont_status_date
+			 , tb1.nap_datetime
+			 , tb1.nap_month
+			 , tb1.gijun_datetime
+			 , tb1.famliy_contract_type AS family_contract_type
+			 , tb1.db_contract_type
+			 , tb1.note_contract
+			 , tb1.transfer_type
+			 , tb1.normal_contract_type
+			 , tb1.switch_contract_type
+			 , tb1.mobile_contract_type
+          FROM tbcn_contract tb1
+	      JOIN tbin_empmst tb2
+	        ON tb1.mb_id = tb2.mb_id
+	       AND tb1.mo_cd = tb2.emp_cd
+	      JOIN tbin_scd tb3
+	        ON tb2.mb_id = tb3.mb_id
+	       AND tb2.scd = tb3.scd
+	 LEFT JOIN tbcn_byenhwan_rate tb4
+	        ON tb1.mb_id = tb4.mb_id
+	       AND tb1.insco_cd = tb4.insco_cd
+	       AND tb1.prod_kind1 = tb4.prod_kind1
+	       AND tb1.prod_kind2 = tb4.prod_kind2
+	       AND CAST(tb1.napgi AS SIGNED) <![CDATA[>=]]> CAST(tb4.strt_napgi AS SIGNED)
+		   AND CAST(tb1.napgi AS SIGNED) <![CDATA[<]]> CAST(tb4.end_napgi AS SIGNED)
+	       AND tb4.com_ym = #{com_ym}
+         WHERE tb1.mb_id = #{mb_id}
+       	   AND tb1.cont_date >= DATE_FORMAT(CONCAT(#{com_ym}, '01'), '%Y-%m-%d')
+        <if test="@kr.co.gnx.comm.util.CommUtil@isNotEmpty(com_ym)">
+           AND tb1.cont_date <![CDATA[<=]]> DATE_FORMAT(LAST_DAY(DATE_FORMAT(CONCAT(#{com_ym}, '01'), '%Y-%m-%d')), '%Y-%m-%d')
+        </if>
+    </select>
+    
+    <select id="selectErpContractShareList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpContractShareList" ERP 계약 쉐어 데이터 조회 */
+        SELECT tb1.mb_id
+             , #{com_ym} AS com_ym
+             , tb1.insco_cd
+             , tb1.inspol_no
+             , tb1.emp_cd
+             , IFNULL(tb1.share_idx, 0) AS share_idx
+             , IFNULL(tb1.fees_ratio, 0) AS share_rate
+          FROM tbcn_contract_share tb1
+          JOIN tbcn_contract tb2
+            ON tb1.mb_id = tb2.mb_id
+           AND tb1.insco_cd = tb2.insco_cd
+           AND tb1.inspol_no = tb2.inspol_no
+         WHERE tb1.mb_id = #{mb_id}
+           AND IFNULL(tb1.emp_cd, '') != ''
+           AND tb2.cont_date <![CDATA[<=]]> DATE_FORMAT(LAST_DAY(DATE_FORMAT(CONCAT(#{com_ym}, '01'), '%Y-%m-%d')), '%Y-%m-%d')
+           AND tb2.cont_date >= '2022-06-01'
+    </select>
+    
+    <select id="selectErpMonthContractShareList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpMonthContractShareList" ERP 계약 쉐어 마감 데이터 조회 */
+        SELECT mb_id
+             , com_ym
+             , insco_cd
+             , inspol_no
+             , share_emp_cd AS emp_cd
+             , IFNULL(share_idx, 0) AS share_idx
+             , IFNULL(fees_ratio, 0) AS share_rate
+          FROM tbcn_contract_existing_month tb1
+         WHERE mb_id = #{mb_id}
+           AND com_ym = #{com_ym}
+           AND IFNULL(share_emp_cd, '') != ''
+           AND cont_date >= '2022-06-01'
+    </select>
+    
+    <select id="selectErpEmpUsiList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpEmpUsiList" 인별 유지율 데이터 가져오기 */
+        SELECT tb1.mb_id 
+             , tb1.com_ym
+             , tb1.emp_cd
+             , tb1.turn_cnt_gbn
+             , tb1.insco_type
+             , CASE WHEN IFNULL(tb1.mojibgo2, 0) = 0 THEN NULL ELSE (tb1.usigo2 / tb1.mojibgo2) * 100 END AS usi_rate2
+             , CASE WHEN IFNULL(tb1.mojibgo3, 0) = 0 THEN NULL ELSE (tb1.usigo3 / tb1.mojibgo3) * 100 END AS usi_rate3
+             , CASE WHEN IFNULL(tb1.mojibgo4, 0) = 0 THEN NULL ELSE (tb1.usigo4 / tb1.mojibgo4) * 100 END AS usi_rate4
+             , CASE WHEN IFNULL(tb1.mojibgo5, 0) = 0 THEN NULL ELSE (tb1.usigo5 / tb1.mojibgo5) * 100 END AS usi_rate5
+             , CASE WHEN IFNULL(tb1.mojibgo6, 0) = 0 THEN NULL ELSE (tb1.usigo6 / tb1.mojibgo6) * 100 END AS usi_rate6
+             , CASE WHEN IFNULL(tb1.mojibgo7, 0) = 0 THEN NULL ELSE (tb1.usigo7 / tb1.mojibgo7) * 100 END AS usi_rate7
+             , CASE WHEN IFNULL(tb1.mojibgo8, 0) = 0 THEN NULL ELSE (tb1.usigo8 / tb1.mojibgo8) * 100 END AS usi_rate8
+             , CASE WHEN IFNULL(tb1.mojibgo9, 0) = 0 THEN NULL ELSE (tb1.usigo9 / tb1.mojibgo9) * 100 END AS usi_rate9
+             , CASE WHEN IFNULL(tb1.mojibgo10, 0) = 0 THEN NULL ELSE (tb1.usigo10 / tb1.mojibgo10) * 100 END AS usi_rate10
+             , CASE WHEN IFNULL(tb1.mojibgo11, 0) = 0 THEN NULL ELSE (tb1.usigo11 / tb1.mojibgo11) * 100 END AS usi_rate11
+             , CASE WHEN IFNULL(tb1.mojibgo12, 0) = 0 THEN NULL ELSE (tb1.usigo12 / tb1.mojibgo12) * 100 END AS usi_rate12
+             , CASE WHEN IFNULL(tb1.mojibgo13, 0) = 0 THEN NULL ELSE (tb1.usigo13 / tb1.mojibgo13) * 100 END AS usi_rate13
+             , CASE WHEN IFNULL(tb1.mojibgo14, 0) = 0 THEN NULL ELSE (tb1.usigo14 / tb1.mojibgo14) * 100 END AS usi_rate14
+             , CASE WHEN IFNULL(tb1.mojibgo15, 0) = 0 THEN NULL ELSE (tb1.usigo15 / tb1.mojibgo15) * 100 END AS usi_rate15
+             , CASE WHEN IFNULL(tb1.mojibgo16, 0) = 0 THEN NULL ELSE (tb1.usigo16 / tb1.mojibgo16) * 100 END AS usi_rate16
+             , CASE WHEN IFNULL(tb1.mojibgo17, 0) = 0 THEN NULL ELSE (tb1.usigo17 / tb1.mojibgo17) * 100 END AS usi_rate17
+             , CASE WHEN IFNULL(tb1.mojibgo18, 0) = 0 THEN NULL ELSE (tb1.usigo18 / tb1.mojibgo18) * 100 END AS usi_rate18
+             , CASE WHEN IFNULL(tb1.mojibgo19, 0) = 0 THEN NULL ELSE (tb1.usigo19 / tb1.mojibgo19) * 100 END AS usi_rate19
+             , CASE WHEN IFNULL(tb1.mojibgo20, 0) = 0 THEN NULL ELSE (tb1.usigo20 / tb1.mojibgo20) * 100 END AS usi_rate20
+             , CASE WHEN IFNULL(tb1.mojibgo21, 0) = 0 THEN NULL ELSE (tb1.usigo21 / tb1.mojibgo21) * 100 END AS usi_rate21
+             , CASE WHEN IFNULL(tb1.mojibgo22, 0) = 0 THEN NULL ELSE (tb1.usigo22 / tb1.mojibgo22) * 100 END AS usi_rate22
+             , CASE WHEN IFNULL(tb1.mojibgo23, 0) = 0 THEN NULL ELSE (tb1.usigo23 / tb1.mojibgo23) * 100 END AS usi_rate23
+             , CASE WHEN IFNULL(tb1.mojibgo24, 0) = 0 THEN NULL ELSE (tb1.usigo24 / tb1.mojibgo24) * 100 END AS usi_rate24
+             , CASE WHEN IFNULL(tb1.mojibgo25, 0) = 0 THEN NULL ELSE (tb1.usigo25 / tb1.mojibgo25) * 100 END AS usi_rate25
+             , CASE WHEN IFNULL(tb1.mojibgo26, 0) = 0 THEN NULL ELSE (tb1.usigo26 / tb1.mojibgo26) * 100 END AS usi_rate26
+             , CASE WHEN IFNULL(tb1.mojibgo27, 0) = 0 THEN NULL ELSE (tb1.usigo27 / tb1.mojibgo27) * 100 END AS usi_rate27
+             , CASE WHEN IFNULL(tb1.mojibgo28, 0) = 0 THEN NULL ELSE (tb1.usigo28 / tb1.mojibgo28) * 100 END AS usi_rate28
+             , CASE WHEN IFNULL(tb1.mojibgo29, 0) = 0 THEN NULL ELSE (tb1.usigo29 / tb1.mojibgo29) * 100 END AS usi_rate29
+             , CASE WHEN IFNULL(tb1.mojibgo30, 0) = 0 THEN NULL ELSE (tb1.usigo30 / tb1.mojibgo30) * 100 END AS usi_rate30
+             , CASE WHEN IFNULL(tb1.mojibgo31, 0) = 0 THEN NULL ELSE (tb1.usigo31 / tb1.mojibgo31) * 100 END AS usi_rate31
+             , CASE WHEN IFNULL(tb1.mojibgo32, 0) = 0 THEN NULL ELSE (tb1.usigo32 / tb1.mojibgo32) * 100 END AS usi_rate32
+             , CASE WHEN IFNULL(tb1.mojibgo33, 0) = 0 THEN NULL ELSE (tb1.usigo33 / tb1.mojibgo33) * 100 END AS usi_rate33
+             , CASE WHEN IFNULL(tb1.mojibgo34, 0) = 0 THEN NULL ELSE (tb1.usigo34 / tb1.mojibgo34) * 100 END AS usi_rate34
+             , CASE WHEN IFNULL(tb1.mojibgo35, 0) = 0 THEN NULL ELSE (tb1.usigo35 / tb1.mojibgo35) * 100 END AS usi_rate35
+             , CASE WHEN IFNULL(tb1.mojibgo36, 0) = 0 THEN NULL ELSE (tb1.usigo36 / tb1.mojibgo36) * 100 END AS usi_rate36
+             , CASE WHEN IFNULL(tb1.mojibgo37, 0) = 0 THEN NULL ELSE (tb1.usigo37 / tb1.mojibgo37) * 100 END AS usi_rate37
+             , CASE WHEN total_mojibgo7 = 0 THEN NULL ELSE (total_usigo7 / total_mojibgo7) * 100 END AS total_usi_rate7 
+             , CASE WHEN total_mojibgo13 = 0 THEN NULL ELSE (total_usigo13 / total_mojibgo13) * 100 END AS total_usi_rate13 
+             , CASE WHEN total_mojibgo18 = 0 THEN NULL ELSE (total_usigo18 / total_mojibgo18) * 100 END AS total_usi_rate18 
+             , CASE WHEN total_mojibgo25 = 0 THEN NULL ELSE (total_usigo25 / total_mojibgo25) * 100 END AS total_usi_rate25 
+             
+          from (SELECT mb_id 
+                     , com_ym 
+                     , emp_cd 
+                     , turn_cnt_gbn 
+                     , 'L' as insco_type
+                     , SUM(mojibgo2) as mojibgo2
+                     , SUM(usigo2) as usigo2
+                     , SUM(mojibgo3) as mojibgo3
+                     , SUM(usigo3) as usigo3
+                     , SUM(mojibgo4) as mojibgo4
+                     , SUM(usigo4) as usigo4
+                     , SUM(mojibgo5) as mojibgo5
+                     , SUM(usigo5) as usigo5
+                     , SUM(mojibgo6) as mojibgo6
+                     , SUM(usigo6) as usigo6
+                     , SUM(mojibgo7) as mojibgo7
+                     , SUM(usigo7) as usigo7
+                     , SUM(mojibgo8) as mojibgo8
+                     , SUM(usigo8) as usigo8
+                     , SUM(mojibgo9) as mojibgo9
+                     , SUM(usigo9) as usigo9
+                     , SUM(mojibgo10) as mojibgo10
+                     , SUM(usigo10) as usigo10
+                     , SUM(mojibgo11) as mojibgo11
+                     , SUM(usigo11) as usigo11
+                     , SUM(mojibgo12) as mojibgo12
+                     , SUM(usigo12) as usigo12
+                     , SUM(mojibgo13) as mojibgo13
+                     , SUM(usigo13) as usigo13
+                     , SUM(mojibgo14) as mojibgo14
+                     , SUM(usigo14) as usigo14
+                     , SUM(mojibgo15) as mojibgo15
+                     , SUM(usigo15) as usigo15
+                     , SUM(mojibgo16) as mojibgo16
+                     , SUM(usigo16) as usigo16
+                     , SUM(mojibgo17) as mojibgo17
+                     , SUM(usigo17) as usigo17
+                     , SUM(mojibgo18) as mojibgo18
+                     , SUM(usigo18) as usigo18
+                     , SUM(mojibgo19) as mojibgo19
+                     , SUM(usigo19) as usigo19
+                     , SUM(mojibgo20) as mojibgo20
+                     , SUM(usigo20) as usigo20
+                     , SUM(mojibgo21) as mojibgo21
+                     , SUM(usigo21) as usigo21
+                     , SUM(mojibgo22) as mojibgo22
+                     , SUM(usigo22) as usigo22
+                     , SUM(mojibgo23) as mojibgo23
+                     , SUM(usigo23) as usigo23
+                     , SUM(mojibgo24) as mojibgo24
+                     , SUM(usigo24) as usigo24
+                     , SUM(mojibgo25) as mojibgo25
+                     , SUM(usigo25) as usigo25
+                     , SUM(mojibgo26) as mojibgo26
+                     , SUM(usigo26) as usigo26
+                     , SUM(mojibgo27) as mojibgo27
+                     , SUM(usigo27) as usigo27
+                     , SUM(mojibgo28) as mojibgo28
+                     , SUM(usigo28) as usigo28
+                     , SUM(mojibgo29) as mojibgo29
+                     , SUM(usigo29) as usigo29
+                     , SUM(mojibgo30) as mojibgo30
+                     , SUM(usigo30) as usigo30
+                     , SUM(mojibgo31) as mojibgo31
+                     , SUM(usigo31) as usigo31
+                     , SUM(mojibgo32) as mojibgo32
+                     , SUM(usigo32) as usigo32
+                     , SUM(mojibgo33) as mojibgo33
+                     , SUM(usigo33) as usigo33
+                     , SUM(mojibgo34) as mojibgo34
+                     , SUM(usigo34) as usigo34
+                     , SUM(mojibgo35) as mojibgo35
+                     , SUM(usigo35) as usigo35
+                     , SUM(mojibgo36) as mojibgo36
+                     , SUM(usigo36) as usigo36
+                     , SUM(mojibgo37) as mojibgo37
+                     , SUM(usigo37) as usigo37
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7)AS total_usigo7 /* 2~7회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7)AS total_mojibgo7 /* 2~7회차 모집고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13)AS total_usigo13 /* 2~13회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13)AS total_mojibgo13 /* 2~13회차 모집고고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13+usigo14+usigo15+usigo16+usigo17+usigo18)AS total_usigo18 /* 2~18회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13+mojibgo14+mojibgo15+mojibgo16
+                     +mojibgo17+mojibgo18)AS total_mojibgo18 /* 2~18회차 모집고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13+usigo14+usigo15+usigo16+usigo17+usigo18+usigo19+usigo20
+                     +usigo21+usigo22+usigo23+usigo24+usigo25)AS total_usigo25 /* 2~25회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13+mojibgo14+mojibgo15+mojibgo16+mojibgo17
+                     +mojibgo18+mojibgo19+mojibgo20+mojibgo21+mojibgo22+mojibgo23+mojibgo24+mojibgo25)AS total_mojibgo25 /* 2~25회차 모집고합*/
+        
+                  FROM tbcn_contract_usi_emp
+                 WHERE MB_ID = #{mb_id}
+                   AND com_ym = #{com_ym}
+                   AND insco_cd like 'L%'
+                 GROUP BY mb_id, com_ym, emp_cd, turn_cnt_gbn
+                 UNION ALL
+                SELECT mb_id 
+                     , com_ym 
+                     , emp_cd 
+                     , turn_cnt_gbn 
+                     , 'N' as insco_type
+                     , SUM(mojibgo2) as mojibgo2
+                     , SUM(usigo2) as usigo2
+                     , SUM(mojibgo3) as mojibgo3
+                     , SUM(usigo3) as usigo3
+                     , SUM(mojibgo4) as mojibgo4
+                     , SUM(usigo4) as usigo4
+                     , SUM(mojibgo5) as mojibgo5
+                     , SUM(usigo5) as usigo5
+                     , SUM(mojibgo6) as mojibgo6
+                     , SUM(usigo6) as usigo6
+                     , SUM(mojibgo7) as mojibgo7
+                     , SUM(usigo7) as usigo7
+                     , SUM(mojibgo8) as mojibgo8
+                     , SUM(usigo8) as usigo8
+                     , SUM(mojibgo9) as mojibgo9
+                     , SUM(usigo9) as usigo9
+                     , SUM(mojibgo10) as mojibgo10
+                     , SUM(usigo10) as usigo10
+                     , SUM(mojibgo11) as mojibgo11
+                     , SUM(usigo11) as usigo11
+                     , SUM(mojibgo12) as mojibgo12
+                     , SUM(usigo12) as usigo12
+                     , SUM(mojibgo13) as mojibgo13
+                     , SUM(usigo13) as usigo13
+                     , SUM(mojibgo14) as mojibgo14
+                     , SUM(usigo14) as usigo14
+                     , SUM(mojibgo15) as mojibgo15
+                     , SUM(usigo15) as usigo15
+                     , SUM(mojibgo16) as mojibgo16
+                     , SUM(usigo16) as usigo16
+                     , SUM(mojibgo17) as mojibgo17
+                     , SUM(usigo17) as usigo17
+                     , SUM(mojibgo18) as mojibgo18
+                     , SUM(usigo18) as usigo18
+                     , SUM(mojibgo19) as mojibgo19
+                     , SUM(usigo19) as usigo19
+                     , SUM(mojibgo20) as mojibgo20
+                     , SUM(usigo20) as usigo20
+                     , SUM(mojibgo21) as mojibgo21
+                     , SUM(usigo21) as usigo21
+                     , SUM(mojibgo22) as mojibgo22
+                     , SUM(usigo22) as usigo22
+                     , SUM(mojibgo23) as mojibgo23
+                     , SUM(usigo23) as usigo23
+                     , SUM(mojibgo24) as mojibgo24
+                     , SUM(usigo24) as usigo24
+                     , SUM(mojibgo25) as mojibgo25
+                     , SUM(usigo25) as usigo25
+                     , SUM(mojibgo26) as mojibgo26
+                     , SUM(usigo26) as usigo26
+                     , SUM(mojibgo27) as mojibgo27
+                     , SUM(usigo27) as usigo27
+                     , SUM(mojibgo28) as mojibgo28
+                     , SUM(usigo28) as usigo28
+                     , SUM(mojibgo29) as mojibgo29
+                     , SUM(usigo29) as usigo29
+                     , SUM(mojibgo30) as mojibgo30
+                     , SUM(usigo30) as usigo30
+                     , SUM(mojibgo31) as mojibgo31
+                     , SUM(usigo31) as usigo31
+                     , SUM(mojibgo32) as mojibgo32
+                     , SUM(usigo32) as usigo32
+                     , SUM(mojibgo33) as mojibgo33
+                     , SUM(usigo33) as usigo33
+                     , SUM(mojibgo34) as mojibgo34
+                     , SUM(usigo34) as usigo34
+                     , SUM(mojibgo35) as mojibgo35
+                     , SUM(usigo35) as usigo35
+                     , SUM(mojibgo36) as mojibgo36
+                     , SUM(usigo36) as usigo36
+                     , SUM(mojibgo37) as mojibgo37
+                     , SUM(usigo37) as usigo37
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7)AS total_usigo7 /* 2~7회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7)AS total_mojibgo7 /* 2~7회차 모집고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13)AS total_usigo13 /* 2~13회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13)AS total_mojibgo13 /* 2~13회차 모집고고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13+usigo14+usigo15+usigo16+usigo17+usigo18)AS total_usigo18 /* 2~18회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13+mojibgo14+mojibgo15+mojibgo16
+                     +mojibgo17+mojibgo18)AS total_mojibgo18 /* 2~18회차 모집고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13+usigo14+usigo15+usigo16+usigo17+usigo18+usigo19+usigo20
+                     +usigo21+usigo22+usigo23+usigo24+usigo25)AS total_usigo25 /* 2~25회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13+mojibgo14+mojibgo15+mojibgo16+mojibgo17
+                     +mojibgo18+mojibgo19+mojibgo20+mojibgo21+mojibgo22+mojibgo23+mojibgo24+mojibgo25)AS total_mojibgo25 /* 2~25회차 모집고합*/
+                     
+                  from tbcn_contract_usi_emp
+                 WHERE MB_ID = #{mb_id}
+                   AND com_ym = #{com_ym}
+                   AND insco_cd like 'N%'
+                 GROUP BY mb_id, com_ym, emp_cd, turn_cnt_gbn
+                 UNION ALL
+                SELECT mb_id 
+                     , com_ym 
+                     , emp_cd 
+                     , turn_cnt_gbn 
+                     , 'ALL' as insco_type
+                     , SUM(mojibgo2) as mojibgo2
+                     , SUM(usigo2) as usigo2
+                     , SUM(mojibgo3) as mojibgo3
+                     , SUM(usigo3) as usigo3
+                     , SUM(mojibgo4) as mojibgo4
+                     , SUM(usigo4) as usigo4
+                     , SUM(mojibgo5) as mojibgo5
+                     , SUM(usigo5) as usigo5
+                     , SUM(mojibgo6) as mojibgo6
+                     , SUM(usigo6) as usigo6
+                     , SUM(mojibgo7) as mojibgo7
+                     , SUM(usigo7) as usigo7
+                     , SUM(mojibgo8) as mojibgo8
+                     , SUM(usigo8) as usigo8
+                     , SUM(mojibgo9) as mojibgo9
+                     , SUM(usigo9) as usigo9
+                     , SUM(mojibgo10) as mojibgo10
+                     , SUM(usigo10) as usigo10
+                     , SUM(mojibgo11) as mojibgo11
+                     , SUM(usigo11) as usigo11
+                     , SUM(mojibgo12) as mojibgo12
+                     , SUM(usigo12) as usigo12
+                     , SUM(mojibgo13) as mojibgo13
+                     , SUM(usigo13) as usigo13
+                     , SUM(mojibgo14) as mojibgo14
+                     , SUM(usigo14) as usigo14
+                     , SUM(mojibgo15) as mojibgo15
+                     , SUM(usigo15) as usigo15
+                     , SUM(mojibgo16) as mojibgo16
+                     , SUM(usigo16) as usigo16
+                     , SUM(mojibgo17) as mojibgo17
+                     , SUM(usigo17) as usigo17
+                     , SUM(mojibgo18) as mojibgo18
+                     , SUM(usigo18) as usigo18
+                     , SUM(mojibgo19) as mojibgo19
+                     , SUM(usigo19) as usigo19
+                     , SUM(mojibgo20) as mojibgo20
+                     , SUM(usigo20) as usigo20
+                     , SUM(mojibgo21) as mojibgo21
+                     , SUM(usigo21) as usigo21
+                     , SUM(mojibgo22) as mojibgo22
+                     , SUM(usigo22) as usigo22
+                     , SUM(mojibgo23) as mojibgo23
+                     , SUM(usigo23) as usigo23
+                     , SUM(mojibgo24) as mojibgo24
+                     , SUM(usigo24) as usigo24
+                     , SUM(mojibgo25) as mojibgo25
+                     , SUM(usigo25) as usigo25
+                     , SUM(mojibgo26) as mojibgo26
+                     , SUM(usigo26) as usigo26
+                     , SUM(mojibgo27) as mojibgo27
+                     , SUM(usigo27) as usigo27
+                     , SUM(mojibgo28) as mojibgo28
+                     , SUM(usigo28) as usigo28
+                     , SUM(mojibgo29) as mojibgo29
+                     , SUM(usigo29) as usigo29
+                     , SUM(mojibgo30) as mojibgo30
+                     , SUM(usigo30) as usigo30
+                     , SUM(mojibgo31) as mojibgo31
+                     , SUM(usigo31) as usigo31
+                     , SUM(mojibgo32) as mojibgo32
+                     , SUM(usigo32) as usigo32
+                     , SUM(mojibgo33) as mojibgo33
+                     , SUM(usigo33) as usigo33
+                     , SUM(mojibgo34) as mojibgo34
+                     , SUM(usigo34) as usigo34
+                     , SUM(mojibgo35) as mojibgo35
+                     , SUM(usigo35) as usigo35
+                     , SUM(mojibgo36) as mojibgo36
+                     , SUM(usigo36) as usigo36
+                     , SUM(mojibgo37) as mojibgo37
+                     , SUM(usigo37) as usigo37
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7)AS total_usigo7 /* 2~7회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7)AS total_mojibgo7 /* 2~7회차 모집고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13)AS total_usigo13 /* 2~13회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13)AS total_mojibgo13 /* 2~13회차 모집고고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13+usigo14+usigo15+usigo16+usigo17+usigo18)AS total_usigo18 /* 2~18회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13+mojibgo14+mojibgo15+mojibgo16
+                     +mojibgo17+mojibgo18)AS total_mojibgo18 /* 2~18회차 모집고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13+usigo14+usigo15+usigo16+usigo17+usigo18+usigo19+usigo20
+                     +usigo21+usigo22+usigo23+usigo24+usigo25)AS total_usigo25 /* 2~25회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13+mojibgo14+mojibgo15+mojibgo16+mojibgo17
+                     +mojibgo18+mojibgo19+mojibgo20+mojibgo21+mojibgo22+mojibgo23+mojibgo24+mojibgo25)AS total_mojibgo25 /* 2~25회차 모집고합*/
+                  from tbcn_contract_usi_emp
+                 WHERE MB_ID = #{mb_id}
+                   AND com_ym = #{com_ym}
+                 GROUP BY mb_id, com_ym, emp_cd, turn_cnt_gbn
+                 UNION ALL
+                SELECT mb_id 
+                     , com_ym 
+                     , emp_cd 
+                     , turn_cnt_gbn 
+                     , insco_cd as insco_type
+                     , SUM(mojibgo2) as mojibgo2
+                     , SUM(usigo2) as usigo2
+                     , SUM(mojibgo3) as mojibgo3
+                     , SUM(usigo3) as usigo3
+                     , SUM(mojibgo4) as mojibgo4
+                     , SUM(usigo4) as usigo4
+                     , SUM(mojibgo5) as mojibgo5
+                     , SUM(usigo5) as usigo5
+                     , SUM(mojibgo6) as mojibgo6
+                     , SUM(usigo6) as usigo6
+                     , SUM(mojibgo7) as mojibgo7
+                     , SUM(usigo7) as usigo7
+                     , SUM(mojibgo8) as mojibgo8
+                     , SUM(usigo8) as usigo8
+                     , SUM(mojibgo9) as mojibgo9
+                     , SUM(usigo9) as usigo9
+                     , SUM(mojibgo10) as mojibgo10
+                     , SUM(usigo10) as usigo10
+                     , SUM(mojibgo11) as mojibgo11
+                     , SUM(usigo11) as usigo11
+                     , SUM(mojibgo12) as mojibgo12
+                     , SUM(usigo12) as usigo12
+                     , SUM(mojibgo13) as mojibgo13
+                     , SUM(usigo13) as usigo13
+                     , SUM(mojibgo14) as mojibgo14
+                     , SUM(usigo14) as usigo14
+                     , SUM(mojibgo15) as mojibgo15
+                     , SUM(usigo15) as usigo15
+                     , SUM(mojibgo16) as mojibgo16
+                     , SUM(usigo16) as usigo16
+                     , SUM(mojibgo17) as mojibgo17
+                     , SUM(usigo17) as usigo17
+                     , SUM(mojibgo18) as mojibgo18
+                     , SUM(usigo18) as usigo18
+                     , SUM(mojibgo19) as mojibgo19
+                     , SUM(usigo19) as usigo19
+                     , SUM(mojibgo20) as mojibgo20
+                     , SUM(usigo20) as usigo20
+                     , SUM(mojibgo21) as mojibgo21
+                     , SUM(usigo21) as usigo21
+                     , SUM(mojibgo22) as mojibgo22
+                     , SUM(usigo22) as usigo22
+                     , SUM(mojibgo23) as mojibgo23
+                     , SUM(usigo23) as usigo23
+                     , SUM(mojibgo24) as mojibgo24
+                     , SUM(usigo24) as usigo24
+                     , SUM(mojibgo25) as mojibgo25
+                     , SUM(usigo25) as usigo25
+                     , SUM(mojibgo26) as mojibgo26
+                     , SUM(usigo26) as usigo26
+                     , SUM(mojibgo27) as mojibgo27
+                     , SUM(usigo27) as usigo27
+                     , SUM(mojibgo28) as mojibgo28
+                     , SUM(usigo28) as usigo28
+                     , SUM(mojibgo29) as mojibgo29
+                     , SUM(usigo29) as usigo29
+                     , SUM(mojibgo30) as mojibgo30
+                     , SUM(usigo30) as usigo30
+                     , SUM(mojibgo31) as mojibgo31
+                     , SUM(usigo31) as usigo31
+                     , SUM(mojibgo32) as mojibgo32
+                     , SUM(usigo32) as usigo32
+                     , SUM(mojibgo33) as mojibgo33
+                     , SUM(usigo33) as usigo33
+                     , SUM(mojibgo34) as mojibgo34
+                     , SUM(usigo34) as usigo34
+                     , SUM(mojibgo35) as mojibgo35
+                     , SUM(usigo35) as usigo35
+                     , SUM(mojibgo36) as mojibgo36
+                     , SUM(usigo36) as usigo36
+                     , SUM(mojibgo37) as mojibgo37
+                     , SUM(usigo37) as usigo37
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7)AS total_usigo7 /* 2~7회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7)AS total_mojibgo7 /* 2~7회차 모집고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13)AS total_usigo13 /* 2~13회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13)AS total_mojibgo13 /* 2~13회차 모집고고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13+usigo14+usigo15+usigo16+usigo17+usigo18)AS total_usigo18 /* 2~18회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13+mojibgo14+mojibgo15+mojibgo16
+                     +mojibgo17+mojibgo18)AS total_mojibgo18 /* 2~18회차 모집고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13+usigo14+usigo15+usigo16+usigo17+usigo18+usigo19+usigo20
+                     +usigo21+usigo22+usigo23+usigo24+usigo25)AS total_usigo25 /* 2~25회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13+mojibgo14+mojibgo15+mojibgo16+mojibgo17
+                     +mojibgo18+mojibgo19+mojibgo20+mojibgo21+mojibgo22+mojibgo23+mojibgo24+mojibgo25)AS total_mojibgo25 /* 2~25회차 모집고합*/
+                     
+                  FROM tbcn_contract_usi_emp
+                 WHERE MB_ID = #{mb_id}
+                   AND com_ym = #{com_ym}
+                   AND insco_cd = 'L34'		/* 한화생명 유지율도 필요함 */
+                 GROUP BY mb_id, com_ym, emp_cd, turn_cnt_gbn
+               ) tb1
+    </select>
+    
+    <select id="selectErpOrgUsiList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpOrgUsiList" 조직별 유지율 데이터 가져오기 */
+        SELECT tb1.mb_id 
+             , tb1.com_ym
+             , tb1.scd
+             , tb1.turn_cnt_gbn
+             , tb1.insco_type
+             , CASE WHEN IFNULL(tb1.mojibgo2, 0) = 0 THEN NULL ELSE (tb1.usigo2 / tb1.mojibgo2) * 100 END AS usi_rate2
+             , CASE WHEN IFNULL(tb1.mojibgo3, 0) = 0 THEN NULL ELSE (tb1.usigo3 / tb1.mojibgo3) * 100 END AS usi_rate3
+             , CASE WHEN IFNULL(tb1.mojibgo4, 0) = 0 THEN NULL ELSE (tb1.usigo4 / tb1.mojibgo4) * 100 END AS usi_rate4
+             , CASE WHEN IFNULL(tb1.mojibgo5, 0) = 0 THEN NULL ELSE (tb1.usigo5 / tb1.mojibgo5) * 100 END AS usi_rate5
+             , CASE WHEN IFNULL(tb1.mojibgo6, 0) = 0 THEN NULL ELSE (tb1.usigo6 / tb1.mojibgo6) * 100 END AS usi_rate6
+             , CASE WHEN IFNULL(tb1.mojibgo7, 0) = 0 THEN NULL ELSE (tb1.usigo7 / tb1.mojibgo7) * 100 END AS usi_rate7
+             , CASE WHEN IFNULL(tb1.mojibgo8, 0) = 0 THEN NULL ELSE (tb1.usigo8 / tb1.mojibgo8) * 100 END AS usi_rate8
+             , CASE WHEN IFNULL(tb1.mojibgo9, 0) = 0 THEN NULL ELSE (tb1.usigo9 / tb1.mojibgo9) * 100 END AS usi_rate9
+             , CASE WHEN IFNULL(tb1.mojibgo10, 0) = 0 THEN NULL ELSE (tb1.usigo10 / tb1.mojibgo10) * 100 END AS usi_rate10
+             , CASE WHEN IFNULL(tb1.mojibgo11, 0) = 0 THEN NULL ELSE (tb1.usigo11 / tb1.mojibgo11) * 100 END AS usi_rate11
+             , CASE WHEN IFNULL(tb1.mojibgo12, 0) = 0 THEN NULL ELSE (tb1.usigo12 / tb1.mojibgo12) * 100 END AS usi_rate12
+             , CASE WHEN IFNULL(tb1.mojibgo13, 0) = 0 THEN NULL ELSE (tb1.usigo13 / tb1.mojibgo13) * 100 END AS usi_rate13
+             , CASE WHEN IFNULL(tb1.mojibgo14, 0) = 0 THEN NULL ELSE (tb1.usigo14 / tb1.mojibgo14) * 100 END AS usi_rate14
+             , CASE WHEN IFNULL(tb1.mojibgo15, 0) = 0 THEN NULL ELSE (tb1.usigo15 / tb1.mojibgo15) * 100 END AS usi_rate15
+             , CASE WHEN IFNULL(tb1.mojibgo16, 0) = 0 THEN NULL ELSE (tb1.usigo16 / tb1.mojibgo16) * 100 END AS usi_rate16
+             , CASE WHEN IFNULL(tb1.mojibgo17, 0) = 0 THEN NULL ELSE (tb1.usigo17 / tb1.mojibgo17) * 100 END AS usi_rate17
+             , CASE WHEN IFNULL(tb1.mojibgo18, 0) = 0 THEN NULL ELSE (tb1.usigo18 / tb1.mojibgo18) * 100 END AS usi_rate18
+             , CASE WHEN IFNULL(tb1.mojibgo19, 0) = 0 THEN NULL ELSE (tb1.usigo19 / tb1.mojibgo19) * 100 END AS usi_rate19
+             , CASE WHEN IFNULL(tb1.mojibgo20, 0) = 0 THEN NULL ELSE (tb1.usigo20 / tb1.mojibgo20) * 100 END AS usi_rate20
+             , CASE WHEN IFNULL(tb1.mojibgo21, 0) = 0 THEN NULL ELSE (tb1.usigo21 / tb1.mojibgo21) * 100 END AS usi_rate21
+             , CASE WHEN IFNULL(tb1.mojibgo22, 0) = 0 THEN NULL ELSE (tb1.usigo22 / tb1.mojibgo22) * 100 END AS usi_rate22
+             , CASE WHEN IFNULL(tb1.mojibgo23, 0) = 0 THEN NULL ELSE (tb1.usigo23 / tb1.mojibgo23) * 100 END AS usi_rate23
+             , CASE WHEN IFNULL(tb1.mojibgo24, 0) = 0 THEN NULL ELSE (tb1.usigo24 / tb1.mojibgo24) * 100 END AS usi_rate24
+             , CASE WHEN IFNULL(tb1.mojibgo25, 0) = 0 THEN NULL ELSE (tb1.usigo25 / tb1.mojibgo25) * 100 END AS usi_rate25
+             , CASE WHEN IFNULL(tb1.mojibgo26, 0) = 0 THEN NULL ELSE (tb1.usigo26 / tb1.mojibgo26) * 100 END AS usi_rate26
+             , CASE WHEN IFNULL(tb1.mojibgo27, 0) = 0 THEN NULL ELSE (tb1.usigo27 / tb1.mojibgo27) * 100 END AS usi_rate27
+             , CASE WHEN IFNULL(tb1.mojibgo28, 0) = 0 THEN NULL ELSE (tb1.usigo28 / tb1.mojibgo28) * 100 END AS usi_rate28
+             , CASE WHEN IFNULL(tb1.mojibgo29, 0) = 0 THEN NULL ELSE (tb1.usigo29 / tb1.mojibgo29) * 100 END AS usi_rate29
+             , CASE WHEN IFNULL(tb1.mojibgo30, 0) = 0 THEN NULL ELSE (tb1.usigo30 / tb1.mojibgo30) * 100 END AS usi_rate30
+             , CASE WHEN IFNULL(tb1.mojibgo31, 0) = 0 THEN NULL ELSE (tb1.usigo31 / tb1.mojibgo31) * 100 END AS usi_rate31
+             , CASE WHEN IFNULL(tb1.mojibgo32, 0) = 0 THEN NULL ELSE (tb1.usigo32 / tb1.mojibgo32) * 100 END AS usi_rate32
+             , CASE WHEN IFNULL(tb1.mojibgo33, 0) = 0 THEN NULL ELSE (tb1.usigo33 / tb1.mojibgo33) * 100 END AS usi_rate33
+             , CASE WHEN IFNULL(tb1.mojibgo34, 0) = 0 THEN NULL ELSE (tb1.usigo34 / tb1.mojibgo34) * 100 END AS usi_rate34
+             , CASE WHEN IFNULL(tb1.mojibgo35, 0) = 0 THEN NULL ELSE (tb1.usigo35 / tb1.mojibgo35) * 100 END AS usi_rate35
+             , CASE WHEN IFNULL(tb1.mojibgo36, 0) = 0 THEN NULL ELSE (tb1.usigo36 / tb1.mojibgo36) * 100 END AS usi_rate36
+             , CASE WHEN IFNULL(tb1.mojibgo37, 0) = 0 THEN NULL ELSE (tb1.usigo37 / tb1.mojibgo37) * 100 END AS usi_rate37
+             , CASE WHEN total_mojibgo7 = 0 THEN NULL ELSE (total_usigo7 / total_mojibgo7) * 100 END AS total_usi_rate7 
+             , CASE WHEN total_mojibgo13 = 0 THEN NULL ELSE (total_usigo13 / total_mojibgo13) * 100 END AS total_usi_rate13 
+             , CASE WHEN total_mojibgo18 = 0 THEN NULL ELSE (total_usigo18 / total_mojibgo18) * 100 END AS total_usi_rate18 
+             , CASE WHEN total_mojibgo25 = 0 THEN NULL ELSE (total_usigo25 / total_mojibgo25) * 100 END AS total_usi_rate25 
+             
+          from (SELECT mb_id 
+                     , com_ym 
+                     , scd 
+                     , turn_cnt_gbn 
+                     , 'L' as insco_type
+                     , SUM(mojibgo2) as mojibgo2
+                     , SUM(usigo2) as usigo2
+                     , SUM(mojibgo3) as mojibgo3
+                     , SUM(usigo3) as usigo3
+                     , SUM(mojibgo4) as mojibgo4
+                     , SUM(usigo4) as usigo4
+                     , SUM(mojibgo5) as mojibgo5
+                     , SUM(usigo5) as usigo5
+                     , SUM(mojibgo6) as mojibgo6
+                     , SUM(usigo6) as usigo6
+                     , SUM(mojibgo7) as mojibgo7
+                     , SUM(usigo7) as usigo7
+                     , SUM(mojibgo8) as mojibgo8
+                     , SUM(usigo8) as usigo8
+                     , SUM(mojibgo9) as mojibgo9
+                     , SUM(usigo9) as usigo9
+                     , SUM(mojibgo10) as mojibgo10
+                     , SUM(usigo10) as usigo10
+                     , SUM(mojibgo11) as mojibgo11
+                     , SUM(usigo11) as usigo11
+                     , SUM(mojibgo12) as mojibgo12
+                     , SUM(usigo12) as usigo12
+                     , SUM(mojibgo13) as mojibgo13
+                     , SUM(usigo13) as usigo13
+                     , SUM(mojibgo14) as mojibgo14
+                     , SUM(usigo14) as usigo14
+                     , SUM(mojibgo15) as mojibgo15
+                     , SUM(usigo15) as usigo15
+                     , SUM(mojibgo16) as mojibgo16
+                     , SUM(usigo16) as usigo16
+                     , SUM(mojibgo17) as mojibgo17
+                     , SUM(usigo17) as usigo17
+                     , SUM(mojibgo18) as mojibgo18
+                     , SUM(usigo18) as usigo18
+                     , SUM(mojibgo19) as mojibgo19
+                     , SUM(usigo19) as usigo19
+                     , SUM(mojibgo20) as mojibgo20
+                     , SUM(usigo20) as usigo20
+                     , SUM(mojibgo21) as mojibgo21
+                     , SUM(usigo21) as usigo21
+                     , SUM(mojibgo22) as mojibgo22
+                     , SUM(usigo22) as usigo22
+                     , SUM(mojibgo23) as mojibgo23
+                     , SUM(usigo23) as usigo23
+                     , SUM(mojibgo24) as mojibgo24
+                     , SUM(usigo24) as usigo24
+                     , SUM(mojibgo25) as mojibgo25
+                     , SUM(usigo25) as usigo25
+                     , SUM(mojibgo26) as mojibgo26
+                     , SUM(usigo26) as usigo26
+                     , SUM(mojibgo27) as mojibgo27
+                     , SUM(usigo27) as usigo27
+                     , SUM(mojibgo28) as mojibgo28
+                     , SUM(usigo28) as usigo28
+                     , SUM(mojibgo29) as mojibgo29
+                     , SUM(usigo29) as usigo29
+                     , SUM(mojibgo30) as mojibgo30
+                     , SUM(usigo30) as usigo30
+                     , SUM(mojibgo31) as mojibgo31
+                     , SUM(usigo31) as usigo31
+                     , SUM(mojibgo32) as mojibgo32
+                     , SUM(usigo32) as usigo32
+                     , SUM(mojibgo33) as mojibgo33
+                     , SUM(usigo33) as usigo33
+                     , SUM(mojibgo34) as mojibgo34
+                     , SUM(usigo34) as usigo34
+                     , SUM(mojibgo35) as mojibgo35
+                     , SUM(usigo35) as usigo35
+                     , SUM(mojibgo36) as mojibgo36
+                     , SUM(usigo36) as usigo36
+                     , SUM(mojibgo37) as mojibgo37
+                     , SUM(usigo37) as usigo37
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7)AS total_usigo7 /* 2~7회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7)AS total_mojibgo7 /* 2~7회차 모집고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13)AS total_usigo13 /* 2~13회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13)AS total_mojibgo13 /* 2~13회차 모집고고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13+usigo14+usigo15+usigo16+usigo17+usigo18)AS total_usigo18 /* 2~18회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13+mojibgo14+mojibgo15+mojibgo16
+                     +mojibgo17+mojibgo18)AS total_mojibgo18 /* 2~18회차 모집고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13+usigo14+usigo15+usigo16+usigo17+usigo18+usigo19+usigo20
+                     +usigo21+usigo22+usigo23+usigo24+usigo25)AS total_usigo25 /* 2~25회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13+mojibgo14+mojibgo15+mojibgo16+mojibgo17
+                     +mojibgo18+mojibgo19+mojibgo20+mojibgo21+mojibgo22+mojibgo23+mojibgo24+mojibgo25)AS total_mojibgo25 /* 2~25회차 모집고합*/
+        
+                  FROM tbcn_contract_usi_scd
+                 WHERE MB_ID = #{mb_id}
+                   AND com_ym = #{com_ym}
+                   AND insco_cd like 'L%'
+                 GROUP BY mb_id, com_ym, scd, turn_cnt_gbn
+                 UNION ALL
+                SELECT mb_id 
+                     , com_ym 
+                     , scd 
+                     , turn_cnt_gbn 
+                     , 'N' as insco_type
+                     , SUM(mojibgo2) as mojibgo2
+                     , SUM(usigo2) as usigo2
+                     , SUM(mojibgo3) as mojibgo3
+                     , SUM(usigo3) as usigo3
+                     , SUM(mojibgo4) as mojibgo4
+                     , SUM(usigo4) as usigo4
+                     , SUM(mojibgo5) as mojibgo5
+                     , SUM(usigo5) as usigo5
+                     , SUM(mojibgo6) as mojibgo6
+                     , SUM(usigo6) as usigo6
+                     , SUM(mojibgo7) as mojibgo7
+                     , SUM(usigo7) as usigo7
+                     , SUM(mojibgo8) as mojibgo8
+                     , SUM(usigo8) as usigo8
+                     , SUM(mojibgo9) as mojibgo9
+                     , SUM(usigo9) as usigo9
+                     , SUM(mojibgo10) as mojibgo10
+                     , SUM(usigo10) as usigo10
+                     , SUM(mojibgo11) as mojibgo11
+                     , SUM(usigo11) as usigo11
+                     , SUM(mojibgo12) as mojibgo12
+                     , SUM(usigo12) as usigo12
+                     , SUM(mojibgo13) as mojibgo13
+                     , SUM(usigo13) as usigo13
+                     , SUM(mojibgo14) as mojibgo14
+                     , SUM(usigo14) as usigo14
+                     , SUM(mojibgo15) as mojibgo15
+                     , SUM(usigo15) as usigo15
+                     , SUM(mojibgo16) as mojibgo16
+                     , SUM(usigo16) as usigo16
+                     , SUM(mojibgo17) as mojibgo17
+                     , SUM(usigo17) as usigo17
+                     , SUM(mojibgo18) as mojibgo18
+                     , SUM(usigo18) as usigo18
+                     , SUM(mojibgo19) as mojibgo19
+                     , SUM(usigo19) as usigo19
+                     , SUM(mojibgo20) as mojibgo20
+                     , SUM(usigo20) as usigo20
+                     , SUM(mojibgo21) as mojibgo21
+                     , SUM(usigo21) as usigo21
+                     , SUM(mojibgo22) as mojibgo22
+                     , SUM(usigo22) as usigo22
+                     , SUM(mojibgo23) as mojibgo23
+                     , SUM(usigo23) as usigo23
+                     , SUM(mojibgo24) as mojibgo24
+                     , SUM(usigo24) as usigo24
+                     , SUM(mojibgo25) as mojibgo25
+                     , SUM(usigo25) as usigo25
+                     , SUM(mojibgo26) as mojibgo26
+                     , SUM(usigo26) as usigo26
+                     , SUM(mojibgo27) as mojibgo27
+                     , SUM(usigo27) as usigo27
+                     , SUM(mojibgo28) as mojibgo28
+                     , SUM(usigo28) as usigo28
+                     , SUM(mojibgo29) as mojibgo29
+                     , SUM(usigo29) as usigo29
+                     , SUM(mojibgo30) as mojibgo30
+                     , SUM(usigo30) as usigo30
+                     , SUM(mojibgo31) as mojibgo31
+                     , SUM(usigo31) as usigo31
+                     , SUM(mojibgo32) as mojibgo32
+                     , SUM(usigo32) as usigo32
+                     , SUM(mojibgo33) as mojibgo33
+                     , SUM(usigo33) as usigo33
+                     , SUM(mojibgo34) as mojibgo34
+                     , SUM(usigo34) as usigo34
+                     , SUM(mojibgo35) as mojibgo35
+                     , SUM(usigo35) as usigo35
+                     , SUM(mojibgo36) as mojibgo36
+                     , SUM(usigo36) as usigo36
+                     , SUM(mojibgo37) as mojibgo37
+                     , SUM(usigo37) as usigo37
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7)AS total_usigo7 /* 2~7회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7)AS total_mojibgo7 /* 2~7회차 모집고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13)AS total_usigo13 /* 2~13회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13)AS total_mojibgo13 /* 2~13회차 모집고고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13+usigo14+usigo15+usigo16+usigo17+usigo18)AS total_usigo18 /* 2~18회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13+mojibgo14+mojibgo15+mojibgo16
+                     +mojibgo17+mojibgo18)AS total_mojibgo18 /* 2~18회차 모집고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13+usigo14+usigo15+usigo16+usigo17+usigo18+usigo19+usigo20
+                     +usigo21+usigo22+usigo23+usigo24+usigo25)AS total_usigo25 /* 2~25회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13+mojibgo14+mojibgo15+mojibgo16+mojibgo17
+                     +mojibgo18+mojibgo19+mojibgo20+mojibgo21+mojibgo22+mojibgo23+mojibgo24+mojibgo25)AS total_mojibgo25 /* 2~25회차 모집고합*/
+                     
+                  from tbcn_contract_usi_scd
+                 WHERE MB_ID = #{mb_id}
+                   AND com_ym = #{com_ym}
+                   AND insco_cd like 'N%'
+                 GROUP BY mb_id, com_ym, scd, turn_cnt_gbn
+                 UNION ALL
+                SELECT mb_id 
+                     , com_ym 
+                     , scd 
+                     , turn_cnt_gbn 
+                     , 'ALL' as insco_type
+                     , SUM(mojibgo2) as mojibgo2
+                     , SUM(usigo2) as usigo2
+                     , SUM(mojibgo3) as mojibgo3
+                     , SUM(usigo3) as usigo3
+                     , SUM(mojibgo4) as mojibgo4
+                     , SUM(usigo4) as usigo4
+                     , SUM(mojibgo5) as mojibgo5
+                     , SUM(usigo5) as usigo5
+                     , SUM(mojibgo6) as mojibgo6
+                     , SUM(usigo6) as usigo6
+                     , SUM(mojibgo7) as mojibgo7
+                     , SUM(usigo7) as usigo7
+                     , SUM(mojibgo8) as mojibgo8
+                     , SUM(usigo8) as usigo8
+                     , SUM(mojibgo9) as mojibgo9
+                     , SUM(usigo9) as usigo9
+                     , SUM(mojibgo10) as mojibgo10
+                     , SUM(usigo10) as usigo10
+                     , SUM(mojibgo11) as mojibgo11
+                     , SUM(usigo11) as usigo11
+                     , SUM(mojibgo12) as mojibgo12
+                     , SUM(usigo12) as usigo12
+                     , SUM(mojibgo13) as mojibgo13
+                     , SUM(usigo13) as usigo13
+                     , SUM(mojibgo14) as mojibgo14
+                     , SUM(usigo14) as usigo14
+                     , SUM(mojibgo15) as mojibgo15
+                     , SUM(usigo15) as usigo15
+                     , SUM(mojibgo16) as mojibgo16
+                     , SUM(usigo16) as usigo16
+                     , SUM(mojibgo17) as mojibgo17
+                     , SUM(usigo17) as usigo17
+                     , SUM(mojibgo18) as mojibgo18
+                     , SUM(usigo18) as usigo18
+                     , SUM(mojibgo19) as mojibgo19
+                     , SUM(usigo19) as usigo19
+                     , SUM(mojibgo20) as mojibgo20
+                     , SUM(usigo20) as usigo20
+                     , SUM(mojibgo21) as mojibgo21
+                     , SUM(usigo21) as usigo21
+                     , SUM(mojibgo22) as mojibgo22
+                     , SUM(usigo22) as usigo22
+                     , SUM(mojibgo23) as mojibgo23
+                     , SUM(usigo23) as usigo23
+                     , SUM(mojibgo24) as mojibgo24
+                     , SUM(usigo24) as usigo24
+                     , SUM(mojibgo25) as mojibgo25
+                     , SUM(usigo25) as usigo25
+                     , SUM(mojibgo26) as mojibgo26
+                     , SUM(usigo26) as usigo26
+                     , SUM(mojibgo27) as mojibgo27
+                     , SUM(usigo27) as usigo27
+                     , SUM(mojibgo28) as mojibgo28
+                     , SUM(usigo28) as usigo28
+                     , SUM(mojibgo29) as mojibgo29
+                     , SUM(usigo29) as usigo29
+                     , SUM(mojibgo30) as mojibgo30
+                     , SUM(usigo30) as usigo30
+                     , SUM(mojibgo31) as mojibgo31
+                     , SUM(usigo31) as usigo31
+                     , SUM(mojibgo32) as mojibgo32
+                     , SUM(usigo32) as usigo32
+                     , SUM(mojibgo33) as mojibgo33
+                     , SUM(usigo33) as usigo33
+                     , SUM(mojibgo34) as mojibgo34
+                     , SUM(usigo34) as usigo34
+                     , SUM(mojibgo35) as mojibgo35
+                     , SUM(usigo35) as usigo35
+                     , SUM(mojibgo36) as mojibgo36
+                     , SUM(usigo36) as usigo36
+                     , SUM(mojibgo37) as mojibgo37
+                     , SUM(usigo37) as usigo37
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7)AS total_usigo7 /* 2~7회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7)AS total_mojibgo7 /* 2~7회차 모집고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13)AS total_usigo13 /* 2~13회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13)AS total_mojibgo13 /* 2~13회차 모집고고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13+usigo14+usigo15+usigo16+usigo17+usigo18)AS total_usigo18 /* 2~18회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13+mojibgo14+mojibgo15+mojibgo16
+                     +mojibgo17+mojibgo18)AS total_mojibgo18 /* 2~18회차 모집고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13+usigo14+usigo15+usigo16+usigo17+usigo18+usigo19+usigo20
+                     +usigo21+usigo22+usigo23+usigo24+usigo25)AS total_usigo25 /* 2~25회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13+mojibgo14+mojibgo15+mojibgo16+mojibgo17
+                     +mojibgo18+mojibgo19+mojibgo20+mojibgo21+mojibgo22+mojibgo23+mojibgo24+mojibgo25)AS total_mojibgo25 /* 2~25회차 모집고합*/
+                  from tbcn_contract_usi_scd
+                 WHERE MB_ID = #{mb_id}
+                   AND com_ym = #{com_ym}
+                 GROUP BY mb_id, com_ym, scd, turn_cnt_gbn
+                 UNION ALL
+                SELECT mb_id 
+                     , com_ym 
+                     , scd 
+                     , turn_cnt_gbn 
+                     , insco_cd as insco_type
+                     , SUM(mojibgo2) as mojibgo2
+                     , SUM(usigo2) as usigo2
+                     , SUM(mojibgo3) as mojibgo3
+                     , SUM(usigo3) as usigo3
+                     , SUM(mojibgo4) as mojibgo4
+                     , SUM(usigo4) as usigo4
+                     , SUM(mojibgo5) as mojibgo5
+                     , SUM(usigo5) as usigo5
+                     , SUM(mojibgo6) as mojibgo6
+                     , SUM(usigo6) as usigo6
+                     , SUM(mojibgo7) as mojibgo7
+                     , SUM(usigo7) as usigo7
+                     , SUM(mojibgo8) as mojibgo8
+                     , SUM(usigo8) as usigo8
+                     , SUM(mojibgo9) as mojibgo9
+                     , SUM(usigo9) as usigo9
+                     , SUM(mojibgo10) as mojibgo10
+                     , SUM(usigo10) as usigo10
+                     , SUM(mojibgo11) as mojibgo11
+                     , SUM(usigo11) as usigo11
+                     , SUM(mojibgo12) as mojibgo12
+                     , SUM(usigo12) as usigo12
+                     , SUM(mojibgo13) as mojibgo13
+                     , SUM(usigo13) as usigo13
+                     , SUM(mojibgo14) as mojibgo14
+                     , SUM(usigo14) as usigo14
+                     , SUM(mojibgo15) as mojibgo15
+                     , SUM(usigo15) as usigo15
+                     , SUM(mojibgo16) as mojibgo16
+                     , SUM(usigo16) as usigo16
+                     , SUM(mojibgo17) as mojibgo17
+                     , SUM(usigo17) as usigo17
+                     , SUM(mojibgo18) as mojibgo18
+                     , SUM(usigo18) as usigo18
+                     , SUM(mojibgo19) as mojibgo19
+                     , SUM(usigo19) as usigo19
+                     , SUM(mojibgo20) as mojibgo20
+                     , SUM(usigo20) as usigo20
+                     , SUM(mojibgo21) as mojibgo21
+                     , SUM(usigo21) as usigo21
+                     , SUM(mojibgo22) as mojibgo22
+                     , SUM(usigo22) as usigo22
+                     , SUM(mojibgo23) as mojibgo23
+                     , SUM(usigo23) as usigo23
+                     , SUM(mojibgo24) as mojibgo24
+                     , SUM(usigo24) as usigo24
+                     , SUM(mojibgo25) as mojibgo25
+                     , SUM(usigo25) as usigo25
+                     , SUM(mojibgo26) as mojibgo26
+                     , SUM(usigo26) as usigo26
+                     , SUM(mojibgo27) as mojibgo27
+                     , SUM(usigo27) as usigo27
+                     , SUM(mojibgo28) as mojibgo28
+                     , SUM(usigo28) as usigo28
+                     , SUM(mojibgo29) as mojibgo29
+                     , SUM(usigo29) as usigo29
+                     , SUM(mojibgo30) as mojibgo30
+                     , SUM(usigo30) as usigo30
+                     , SUM(mojibgo31) as mojibgo31
+                     , SUM(usigo31) as usigo31
+                     , SUM(mojibgo32) as mojibgo32
+                     , SUM(usigo32) as usigo32
+                     , SUM(mojibgo33) as mojibgo33
+                     , SUM(usigo33) as usigo33
+                     , SUM(mojibgo34) as mojibgo34
+                     , SUM(usigo34) as usigo34
+                     , SUM(mojibgo35) as mojibgo35
+                     , SUM(usigo35) as usigo35
+                     , SUM(mojibgo36) as mojibgo36
+                     , SUM(usigo36) as usigo36
+                     , SUM(mojibgo37) as mojibgo37
+                     , SUM(usigo37) as usigo37
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7)AS total_usigo7 /* 2~7회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7)AS total_mojibgo7 /* 2~7회차 모집고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13)AS total_usigo13 /* 2~13회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13)AS total_mojibgo13 /* 2~13회차 모집고고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13+usigo14+usigo15+usigo16+usigo17+usigo18)AS total_usigo18 /* 2~18회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13+mojibgo14+mojibgo15+mojibgo16
+                     +mojibgo17+mojibgo18)AS total_mojibgo18 /* 2~18회차 모집고합*/
+                     , SUM(usigo2+usigo3+usigo4+usigo5+usigo6+usigo7+usigo8+usigo9+usigo10+usigo11+usigo12+usigo13+usigo14+usigo15+usigo16+usigo17+usigo18+usigo19+usigo20
+                     +usigo21+usigo22+usigo23+usigo24+usigo25)AS total_usigo25 /* 2~25회차 유지고합*/
+                     , SUM(mojibgo2+mojibgo3+mojibgo4+mojibgo5+mojibgo6+mojibgo7+mojibgo8+mojibgo9+mojibgo10+mojibgo11+mojibgo12+mojibgo13+mojibgo14+mojibgo15+mojibgo16+mojibgo17
+                     +mojibgo18+mojibgo19+mojibgo20+mojibgo21+mojibgo22+mojibgo23+mojibgo24+mojibgo25)AS total_mojibgo25 /* 2~25회차 모집고합*/
+                     
+                  from tbcn_contract_usi_scd
+                 WHERE MB_ID = #{mb_id}
+                   AND com_ym = #{com_ym}
+                   AND insco_cd = 'L34'		/* 한화생명 유지율도 필요함 */
+                 GROUP BY mb_id, com_ym, scd, turn_cnt_gbn
+               ) tb1
+    </select>
+    
+    <select id="selectErpEmpSugumList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpEmpSugumList" 인별 수금율 데이터 가져오기 */
+        SELECT tbX.mb_id
+             , tbX.com_ym
+             , tbX.emp_cd
+             , tbX.insco_type
+             , tbX.turn_cnt_gbn
+             , CASE
+                   WHEN tbX.total_sugum_resource4 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result4 / tbX.total_sugum_resource4) * 100
+               END AS total_sugum_rate4
+             , CASE
+                   WHEN tbX.total_sugum_resource7 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result7 / tbX.total_sugum_resource7) * 100
+               END AS total_sugum_rate7
+             , CASE
+                   WHEN tbX.total_sugum_resource12 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result12 / tbX.total_sugum_resource12) * 100
+               END AS total_sugum_rate12
+             , CASE
+                   WHEN tbX.total_sugum_resource13 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result13 / tbX.total_sugum_resource13) * 100
+               END AS total_sugum_rate13
+             , CASE
+                   WHEN tbX.total_sugum_resource18 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result18 / tbX.total_sugum_resource18) * 100
+               END AS total_sugum_rate18
+             , CASE
+                   WHEN tbX.total_sugum_resource19 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result19 / tbX.total_sugum_resource19) * 100
+               END AS total_sugum_rate19
+             , CASE
+                   WHEN tbX.total_sugum_resource24 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result24 / tbX.total_sugum_resource24) * 100
+               END AS total_sugum_rate24
+             , CASE
+                   WHEN tbX.total_sugum_resource25 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result25 / tbX.total_sugum_resource25) * 100
+               END AS total_sugum_rate25
+             , CASE
+                   WHEN tbX.total_sugum_resource36 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result36 / tbX.total_sugum_resource36) * 100
+               END AS total_sugum_rate36
+             , CASE
+                   WHEN tbX.total_sugum_resource37 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result37 / tbX.total_sugum_resource37) * 100
+               END AS total_sugum_rate37
+          FROM (SELECT mb_id
+                     , com_ym
+                     , emp_cd
+                     , SUBSTRING(insco_cd, 1, 1) AS insco_type
+                     , turn_cnt_gbn
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4) AS total_sugum_resource4
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7) AS total_sugum_resource7
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12) AS total_sugum_resource12 /* 2~12회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13) AS total_sugum_resource13 /* 2~13회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18) AS total_sugum_resource18 /* 2~18회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19) AS total_sugum_resource19 /* 2~19회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19+tb1.sugum_resource20+tb1.sugum_resource21+tb1.sugum_resource22+tb1.sugum_resource23+tb1.sugum_resource24) AS total_sugum_resource24 /* 2~24회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19+tb1.sugum_resource20+tb1.sugum_resource21+tb1.sugum_resource22+tb1.sugum_resource23+tb1.sugum_resource24+tb1.sugum_resource25) AS total_sugum_resource25 /* 2~24회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19+tb1.sugum_resource20+tb1.sugum_resource21+tb1.sugum_resource22+tb1.sugum_resource23+tb1.sugum_resource24+tb1.sugum_resource25
+                       +tb1.sugum_resource26+tb1.sugum_resource27+tb1.sugum_resource28+tb1.sugum_resource29+tb1.sugum_resource30+tb1.sugum_resource31+tb1.sugum_resource32+tb1.sugum_resource33+tb1.sugum_resource34+tb1.sugum_resource35+tb1.sugum_resource36) AS total_sugum_resource36 /* 2~36회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19+tb1.sugum_resource20+tb1.sugum_resource21+tb1.sugum_resource22+tb1.sugum_resource23+tb1.sugum_resource24+tb1.sugum_resource25
+                       +tb1.sugum_resource26+tb1.sugum_resource27+tb1.sugum_resource28+tb1.sugum_resource29+tb1.sugum_resource30+tb1.sugum_resource31+tb1.sugum_resource32+tb1.sugum_resource33+tb1.sugum_resource34+tb1.sugum_resource35+tb1.sugum_resource36+tb1.sugum_resource37) AS total_sugum_resource37 /* 2~37회차 모집고 합 */
+                                                          
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4) AS total_sugum_result4
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7) AS total_sugum_result7
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12) AS total_sugum_result12 /* 2~12회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13) AS total_sugum_result13 /* 2~13회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18) AS total_sugum_result18 /* 2~18회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19) AS total_sugum_result19 /* 2~19회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19+tb1.sugum_result20+tb1.sugum_result21+tb1.sugum_result22+tb1.sugum_result23+tb1.sugum_result24) AS total_sugum_result24 /* 2~24회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19+tb1.sugum_result20+tb1.sugum_result21+tb1.sugum_result22+tb1.sugum_result23+tb1.sugum_result24+tb1.sugum_result25) AS total_sugum_result25 /* 2~24회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19+tb1.sugum_result20+tb1.sugum_result21+tb1.sugum_result22+tb1.sugum_result23+tb1.sugum_result24+tb1.sugum_result25
+                       +tb1.sugum_result26+tb1.sugum_result27+tb1.sugum_result28+tb1.sugum_result29+tb1.sugum_result30+tb1.sugum_result31+tb1.sugum_result32+tb1.sugum_result33+tb1.sugum_result34+tb1.sugum_result35+tb1.sugum_result36) AS total_sugum_result36 /* 2~36회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19+tb1.sugum_result20+tb1.sugum_result21+tb1.sugum_result22+tb1.sugum_result23+tb1.sugum_result24+tb1.sugum_result25
+                       +tb1.sugum_result26+tb1.sugum_result27+tb1.sugum_result28+tb1.sugum_result29+tb1.sugum_result30+tb1.sugum_result31+tb1.sugum_result32+tb1.sugum_result33+tb1.sugum_result34+tb1.sugum_result35+tb1.sugum_result36+tb1.sugum_result37) AS total_sugum_result37 /* 2~37회차 유지고 합 */
+                  FROM tbcn_contract_sugum_emp_month tb1
+                 WHERE mb_id = #{mb_id}
+                   AND com_ym = #{com_ym}
+                 GROUP BY mb_id, com_ym, emp_cd, SUBSTRING(insco_cd, 1, 1), turn_cnt_gbn
+                 UNION ALL
+                SELECT mb_id
+                     , com_ym
+                     , emp_cd
+                     , 'ALL' AS insco_type
+                     , turn_cnt_gbn
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4) AS total_sugum_resource4
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7) AS total_sugum_resource7
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12) AS total_sugum_resource12 /* 2~12회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13) AS total_sugum_resource13 /* 2~13회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18) AS total_sugum_resource18 /* 2~18회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19) AS total_sugum_resource19 /* 2~19회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19+tb1.sugum_resource20+tb1.sugum_resource21+tb1.sugum_resource22+tb1.sugum_resource23+tb1.sugum_resource24) AS total_sugum_resource24 /* 2~24회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19+tb1.sugum_resource20+tb1.sugum_resource21+tb1.sugum_resource22+tb1.sugum_resource23+tb1.sugum_resource24+tb1.sugum_resource25) AS total_sugum_resource25 /* 2~24회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19+tb1.sugum_resource20+tb1.sugum_resource21+tb1.sugum_resource22+tb1.sugum_resource23+tb1.sugum_resource24+tb1.sugum_resource25
+                       +tb1.sugum_resource26+tb1.sugum_resource27+tb1.sugum_resource28+tb1.sugum_resource29+tb1.sugum_resource30+tb1.sugum_resource31+tb1.sugum_resource32+tb1.sugum_resource33+tb1.sugum_resource34+tb1.sugum_resource35+tb1.sugum_resource36) AS total_sugum_resource36 /* 2~36회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19+tb1.sugum_resource20+tb1.sugum_resource21+tb1.sugum_resource22+tb1.sugum_resource23+tb1.sugum_resource24+tb1.sugum_resource25
+                       +tb1.sugum_resource26+tb1.sugum_resource27+tb1.sugum_resource28+tb1.sugum_resource29+tb1.sugum_resource30+tb1.sugum_resource31+tb1.sugum_resource32+tb1.sugum_resource33+tb1.sugum_resource34+tb1.sugum_resource35+tb1.sugum_resource36+tb1.sugum_resource37) AS total_sugum_resource37 /* 2~37회차 모집고 합 */
+                                                          
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4) AS total_sugum_result4
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7) AS total_sugum_result7
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12) AS total_sugum_result12 /* 2~12회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13) AS total_sugum_result13 /* 2~13회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18) AS total_sugum_result18 /* 2~18회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19) AS total_sugum_result19 /* 2~19회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19+tb1.sugum_result20+tb1.sugum_result21+tb1.sugum_result22+tb1.sugum_result23+tb1.sugum_result24) AS total_sugum_result24 /* 2~24회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19+tb1.sugum_result20+tb1.sugum_result21+tb1.sugum_result22+tb1.sugum_result23+tb1.sugum_result24+tb1.sugum_result25) AS total_sugum_result25 /* 2~24회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19+tb1.sugum_result20+tb1.sugum_result21+tb1.sugum_result22+tb1.sugum_result23+tb1.sugum_result24+tb1.sugum_result25
+                       +tb1.sugum_result26+tb1.sugum_result27+tb1.sugum_result28+tb1.sugum_result29+tb1.sugum_result30+tb1.sugum_result31+tb1.sugum_result32+tb1.sugum_result33+tb1.sugum_result34+tb1.sugum_result35+tb1.sugum_result36) AS total_sugum_result36 /* 2~36회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19+tb1.sugum_result20+tb1.sugum_result21+tb1.sugum_result22+tb1.sugum_result23+tb1.sugum_result24+tb1.sugum_result25
+                       +tb1.sugum_result26+tb1.sugum_result27+tb1.sugum_result28+tb1.sugum_result29+tb1.sugum_result30+tb1.sugum_result31+tb1.sugum_result32+tb1.sugum_result33+tb1.sugum_result34+tb1.sugum_result35+tb1.sugum_result36+tb1.sugum_result37) AS total_sugum_result37 /* 2~37회차 유지고 합 */
+                  FROM tbcn_contract_sugum_emp_month tb1
+                 WHERE mb_id = #{mb_id}
+                   AND com_ym = #{com_ym}
+                 GROUP BY mb_id, com_ym, emp_cd, turn_cnt_gbn
+               ) tbX
+    </select>
+    
+    <select id="selectErpOrgSugumList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectErpOrgSugumList" 조직별 수금율 데이터 가져오기 */
+        SELECT tbX.mb_id
+             , tbX.com_ym
+             , tbX.scd
+             , tbX.insco_type
+             , tbX.turn_cnt_gbn
+             , CASE
+                   WHEN tbX.total_sugum_resource4 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result4 / tbX.total_sugum_resource4) * 100
+               END AS total_sugum_rate4
+             , CASE
+                   WHEN tbX.total_sugum_resource7 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result7 / tbX.total_sugum_resource7) * 100
+               END AS total_sugum_rate7
+             , CASE
+                   WHEN tbX.total_sugum_resource12 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result12 / tbX.total_sugum_resource12) * 100
+               END AS total_sugum_rate12
+             , CASE
+                   WHEN tbX.total_sugum_resource13 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result13 / tbX.total_sugum_resource13) * 100
+               END AS total_sugum_rate13
+             , CASE
+                   WHEN tbX.total_sugum_resource18 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result18 / tbX.total_sugum_resource18) * 100
+               END AS total_sugum_rate18
+             , CASE
+                   WHEN tbX.total_sugum_resource19 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result19 / tbX.total_sugum_resource19) * 100
+               END AS total_sugum_rate19
+             , CASE
+                   WHEN tbX.total_sugum_resource24 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result24 / tbX.total_sugum_resource24) * 100
+               END AS total_sugum_rate24
+             , CASE
+                   WHEN tbX.total_sugum_resource25 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result25 / tbX.total_sugum_resource25) * 100
+               END AS total_sugum_rate25
+             , CASE
+                   WHEN tbX.total_sugum_resource36 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result36 / tbX.total_sugum_resource36) * 100
+               END AS total_sugum_rate36
+             , CASE
+                   WHEN tbX.total_sugum_resource37 = 0 THEN NULL
+                   ELSE (tbX.total_sugum_result37 / tbX.total_sugum_resource37) * 100
+               END AS total_sugum_rate37
+          FROM (SELECT mb_id
+                     , com_ym
+                     , scd
+                     , SUBSTRING(insco_cd, 1, 1) AS insco_type
+                     , turn_cnt_gbn
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4) AS total_sugum_resource4
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7) AS total_sugum_resource7
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12) AS total_sugum_resource12 /* 2~12회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13) AS total_sugum_resource13 /* 2~13회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18) AS total_sugum_resource18 /* 2~18회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19) AS total_sugum_resource19 /* 2~19회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19+tb1.sugum_resource20+tb1.sugum_resource21+tb1.sugum_resource22+tb1.sugum_resource23+tb1.sugum_resource24) AS total_sugum_resource24 /* 2~24회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19+tb1.sugum_resource20+tb1.sugum_resource21+tb1.sugum_resource22+tb1.sugum_resource23+tb1.sugum_resource24+tb1.sugum_resource25) AS total_sugum_resource25 /* 2~24회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19+tb1.sugum_resource20+tb1.sugum_resource21+tb1.sugum_resource22+tb1.sugum_resource23+tb1.sugum_resource24+tb1.sugum_resource25
+                       +tb1.sugum_resource26+tb1.sugum_resource27+tb1.sugum_resource28+tb1.sugum_resource29+tb1.sugum_resource30+tb1.sugum_resource31+tb1.sugum_resource32+tb1.sugum_resource33+tb1.sugum_resource34+tb1.sugum_resource35+tb1.sugum_resource36) AS total_sugum_resource36 /* 2~36회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19+tb1.sugum_resource20+tb1.sugum_resource21+tb1.sugum_resource22+tb1.sugum_resource23+tb1.sugum_resource24+tb1.sugum_resource25
+                       +tb1.sugum_resource26+tb1.sugum_resource27+tb1.sugum_resource28+tb1.sugum_resource29+tb1.sugum_resource30+tb1.sugum_resource31+tb1.sugum_resource32+tb1.sugum_resource33+tb1.sugum_resource34+tb1.sugum_resource35+tb1.sugum_resource36+tb1.sugum_resource37) AS total_sugum_resource37 /* 2~37회차 모집고 합 */
+                                                          
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4) AS total_sugum_result4
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7) AS total_sugum_result7
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12) AS total_sugum_result12 /* 2~12회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13) AS total_sugum_result13 /* 2~13회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18) AS total_sugum_result18 /* 2~18회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19) AS total_sugum_result19 /* 2~19회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19+tb1.sugum_result20+tb1.sugum_result21+tb1.sugum_result22+tb1.sugum_result23+tb1.sugum_result24) AS total_sugum_result24 /* 2~24회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19+tb1.sugum_result20+tb1.sugum_result21+tb1.sugum_result22+tb1.sugum_result23+tb1.sugum_result24+tb1.sugum_result25) AS total_sugum_result25 /* 2~24회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19+tb1.sugum_result20+tb1.sugum_result21+tb1.sugum_result22+tb1.sugum_result23+tb1.sugum_result24+tb1.sugum_result25
+                       +tb1.sugum_result26+tb1.sugum_result27+tb1.sugum_result28+tb1.sugum_result29+tb1.sugum_result30+tb1.sugum_result31+tb1.sugum_result32+tb1.sugum_result33+tb1.sugum_result34+tb1.sugum_result35+tb1.sugum_result36) AS total_sugum_result36 /* 2~36회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19+tb1.sugum_result20+tb1.sugum_result21+tb1.sugum_result22+tb1.sugum_result23+tb1.sugum_result24+tb1.sugum_result25
+                       +tb1.sugum_result26+tb1.sugum_result27+tb1.sugum_result28+tb1.sugum_result29+tb1.sugum_result30+tb1.sugum_result31+tb1.sugum_result32+tb1.sugum_result33+tb1.sugum_result34+tb1.sugum_result35+tb1.sugum_result36+tb1.sugum_result37) AS total_sugum_result37 /* 2~37회차 유지고 합 */
+                  FROM tbcn_contract_sugum_scd_month tb1
+                 WHERE mb_id = #{mb_id}
+                   AND com_ym = #{com_ym}
+                 GROUP BY mb_id, com_ym, scd, SUBSTRING(insco_cd, 1, 1), turn_cnt_gbn
+                 UNION ALL
+                SELECT mb_id
+                     , com_ym
+                     , scd
+                     , 'ALL' AS insco_type
+                     , turn_cnt_gbn
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4) AS total_sugum_resource4
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7) AS total_sugum_resource7
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12) AS total_sugum_resource12 /* 2~12회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13) AS total_sugum_resource13 /* 2~13회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18) AS total_sugum_resource18 /* 2~18회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19) AS total_sugum_resource19 /* 2~19회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19+tb1.sugum_resource20+tb1.sugum_resource21+tb1.sugum_resource22+tb1.sugum_resource23+tb1.sugum_resource24) AS total_sugum_resource24 /* 2~24회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19+tb1.sugum_resource20+tb1.sugum_resource21+tb1.sugum_resource22+tb1.sugum_resource23+tb1.sugum_resource24+tb1.sugum_resource25) AS total_sugum_resource25 /* 2~24회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19+tb1.sugum_resource20+tb1.sugum_resource21+tb1.sugum_resource22+tb1.sugum_resource23+tb1.sugum_resource24+tb1.sugum_resource25
+                       +tb1.sugum_resource26+tb1.sugum_resource27+tb1.sugum_resource28+tb1.sugum_resource29+tb1.sugum_resource30+tb1.sugum_resource31+tb1.sugum_resource32+tb1.sugum_resource33+tb1.sugum_resource34+tb1.sugum_resource35+tb1.sugum_resource36) AS total_sugum_resource36 /* 2~36회차 모집고 합 */
+                     , SUM(tb1.sugum_resource2 +tb1.sugum_resource3+tb1.sugum_resource4+tb1.sugum_resource5+tb1.sugum_resource6+tb1.sugum_resource7+tb1.sugum_resource8+tb1.sugum_resource9+tb1.sugum_resource10+tb1.sugum_resource11+tb1.sugum_resource12+tb1.sugum_resource13
+                       +tb1.sugum_resource14+tb1.sugum_resource15+tb1.sugum_resource16+tb1.sugum_resource17+tb1.sugum_resource18+tb1.sugum_resource19+tb1.sugum_resource20+tb1.sugum_resource21+tb1.sugum_resource22+tb1.sugum_resource23+tb1.sugum_resource24+tb1.sugum_resource25
+                       +tb1.sugum_resource26+tb1.sugum_resource27+tb1.sugum_resource28+tb1.sugum_resource29+tb1.sugum_resource30+tb1.sugum_resource31+tb1.sugum_resource32+tb1.sugum_resource33+tb1.sugum_resource34+tb1.sugum_resource35+tb1.sugum_resource36+tb1.sugum_resource37) AS total_sugum_resource37 /* 2~37회차 모집고 합 */
+                                                          
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4) AS total_sugum_result4
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7) AS total_sugum_result7
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12) AS total_sugum_result12 /* 2~12회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13) AS total_sugum_result13 /* 2~13회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18) AS total_sugum_result18 /* 2~18회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19) AS total_sugum_result19 /* 2~19회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19+tb1.sugum_result20+tb1.sugum_result21+tb1.sugum_result22+tb1.sugum_result23+tb1.sugum_result24) AS total_sugum_result24 /* 2~24회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19+tb1.sugum_result20+tb1.sugum_result21+tb1.sugum_result22+tb1.sugum_result23+tb1.sugum_result24+tb1.sugum_result25) AS total_sugum_result25 /* 2~24회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19+tb1.sugum_result20+tb1.sugum_result21+tb1.sugum_result22+tb1.sugum_result23+tb1.sugum_result24+tb1.sugum_result25
+                       +tb1.sugum_result26+tb1.sugum_result27+tb1.sugum_result28+tb1.sugum_result29+tb1.sugum_result30+tb1.sugum_result31+tb1.sugum_result32+tb1.sugum_result33+tb1.sugum_result34+tb1.sugum_result35+tb1.sugum_result36) AS total_sugum_result36 /* 2~36회차 유지고 합 */
+                     , SUM(tb1.sugum_result2+tb1.sugum_result3+tb1.sugum_result4+tb1.sugum_result5+tb1.sugum_result6+tb1.sugum_result7+tb1.sugum_result8+tb1.sugum_result9+tb1.sugum_result10+tb1.sugum_result11+tb1.sugum_result12+tb1.sugum_result13
+                       +tb1.sugum_result14+tb1.sugum_result15+tb1.sugum_result16+tb1.sugum_result17+tb1.sugum_result18+tb1.sugum_result19+tb1.sugum_result20+tb1.sugum_result21+tb1.sugum_result22+tb1.sugum_result23+tb1.sugum_result24+tb1.sugum_result25
+                       +tb1.sugum_result26+tb1.sugum_result27+tb1.sugum_result28+tb1.sugum_result29+tb1.sugum_result30+tb1.sugum_result31+tb1.sugum_result32+tb1.sugum_result33+tb1.sugum_result34+tb1.sugum_result35+tb1.sugum_result36+tb1.sugum_result37) AS total_sugum_result37 /* 2~37회차 유지고 합 */
+                  FROM tbcn_contract_sugum_scd_month tb1
+                 WHERE mb_id = #{mb_id}
+                   AND com_ym = #{com_ym}
+                 GROUP BY mb_id, com_ym, scd, turn_cnt_gbn
+               ) tbX
+    </select>
+    
+    <select id="selectErpIncompletesalesList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+        /* erp-mapper.xml id="selectMonthScdIsRateDataList" 조직별 불판율 데이터 조회 */
+        WITH recursive org_month_cte
+        AS (SELECT 1 AS level
+                 , CONCAT(tb2.sort_no,tb2.snm) AS ordersb
+                 , CONCAT(' > ',CAST(tb2.scd AS CHAR (509))) AS scdpath
+                 , CONCAT(' > ',CAST(tb2.snm AS CHAR (509))) AS snmpath
+                 , tb2.mb_id
+                 , tb2.com_ym
+                 , tb2.scd             /* 조직코드       VARCHAR(20)  */
+                 , tb2.snm             /* 조직명         VARCHAR(50)  */
+                 , tb2.pscd            /* 상위조직코드   VARCHAR(20)  */
+                 , tb2.org_unit_gbn    /* 조직단위구분   VARCHAR(10)  */
+                 , tb2.org_strt_ymd    /* 조직생성년월일 VARCHAR(10)  */
+                 , tb2.org_end_ymd     /* 조직폐쇄년월일 VARCHAR(10)  */
+                 , tb2.scd_head        /* 조직장         VARCHAR(10)  */
+                 , tb2.telno           /* 조직전화번호   VARCHAR(14)  */
+                 , tb2.faxno           /* 조직팩스번호   VARCHAR(20)  */
+                 , tb2.zipcd           /* 우편번호       VARCHAR(6)   */
+                 , tb2.addr1           /* 주소1          VARCHAR(200) */
+                 , tb2.addr2           /* 주소2          VARCHAR(200) */
+                 , tb2.org_mng_gbn     /* 영업조직여부   VARCHAR(1)   */
+                 , tb2.use_yn          /* 사용여부       VARCHAR(1)   */
+                 , tb2.sort_no         /* 정렬순서       BIGINT       */
+                 , tb2.memo            /* 비고           VARCHAR(200) */
+                 , tb2.in_emp_cd       /* 입력자사번     VARCHAR(20)  */
+                 , tb2.in_dtm          /* 입력일시       DATETIME     */
+                 , tb2.up_emp_cd       /* 수정자사번     VARCHAR(20)  */
+                 , tb2.up_dtm          /* 수정일시       DATETIME     */
+              FROM (SELECT tb1.*
+                      FROM tbin_scd_month tb1
+                     WHERE tb1.mb_id = #{mb_id}
+                       AND tb1.com_ym = #{com_ym}
+                       AND tb1.scd = 'T0000'
+                   ) tb2
+             UNION ALL
+            SELECT level+1 AS level
+                 , CONCAT(org_month_cte.ordersb,LPAD(tb3.sort_no,4,'0'),tb3.snm) AS ordersb
+                 , CONCAT(scdpath,' > ',tb3.scd) AS scdpath
+                 , CONCAT(snmpath,' > ',tb3.snm) AS snmpath
+                 , tb3.mb_id
+                 , tb3.com_ym
+                 , tb3.scd             /* 조직코드       VARCHAR(20)  */
+                 , tb3.snm             /* 조직명         VARCHAR(50)  */
+                 , tb3.pscd            /* 상위조직코드   VARCHAR(20)  */
+                 , tb3.org_unit_gbn    /* 조직단위구분   VARCHAR(10)  */
+                 , tb3.org_strt_ymd    /* 조직생성년월일 VARCHAR(10)  */
+                 , tb3.org_end_ymd     /* 조직폐쇄년월일 VARCHAR(10)  */
+                 , tb3.scd_head        /* 조직장         VARCHAR(10)  */
+                 , tb3.telno           /* 조직전화번호   VARCHAR(14)  */
+                 , tb3.faxno           /* 조직팩스번호   VARCHAR(20)  */
+                 , tb3.zipcd           /* 우편번호       VARCHAR(6)   */
+                 , tb3.addr1           /* 주소1          VARCHAR(200) */
+                 , tb3.addr2           /* 주소2          VARCHAR(200) */
+                 , tb3.org_mng_gbn     /* 영업조직여부   VARCHAR(1)   */
+                 , tb3.use_yn          /* 사용여부       VARCHAR(1)   */
+                 , tb3.sort_no         /* 정렬순서       BIGINT       */
+                 , tb3.memo            /* 비고           VARCHAR(200) */
+                 , tb3.in_emp_cd       /* 입력자사번     VARCHAR(20)  */
+                 , tb3.in_dtm          /* 입력일시       DATETIME     */
+                 , tb3.up_emp_cd       /* 수정자사번     VARCHAR(20)  */
+                 , tb3.up_dtm          /* 수정일시       DATETIME     */
+              FROM (SELECT *
+                      FROM tbin_scd_month
+                     WHERE mb_id = #{mb_id}
+                       AND com_ym = #{com_ym}
+                   ) tb3
+        INNER JOIN org_month_cte
+                ON tb3.pscd = org_month_cte.scd)
+        , incomplete_cte
+          AS (SELECT tb1.mb_id
+                   , tb1.com_ym
+                   , tb1.scd
+                   , tb1.pscd
+                   , IFNULL(tb2.RECRUIT_CNT, 0) AS RECRUIT_CNT
+                   , IFNULL(tb2.CANCEL_CNT, 0) AS CANCEL_CNT
+                FROM tbin_scd_month tb1
+           LEFT JOIN (SELECT tb1.mb_id
+                           , tb1.com_ym
+                           , tb1.scd
+                           , SUM(CASE WHEN tb2.cont_status NOT IN ('취소', '반송') THEN 1 ELSE 0 END) AS RECRUIT_CNT
+                           , SUM(CASE WHEN tb3.inspol_no IS NOT NULL THEN 1 ELSE 0 END) AS CANCEL_CNT
+                        FROM tbin_emp_month tb1
+                   LEFT JOIN (SELECT *
+                                FROM tbcn_contract_existing_month
+                               WHERE mb_id = #{mb_id}
+                                 AND com_ym = #{com_ym}
+                                 AND share_idx = '1'
+                                 AND ins_cont_type = 'LONGTERM'
+                             ) tb2
+                          ON tb1.mb_id = tb2.mb_id
+                         AND tb1.com_ym = tb2.com_ym
+                         AND tb1.emp_cd = tb2.mo_cd
+                   LEFT JOIN (SELECT * FROM tbri_sellingrisk_contract_month WHERE mb_id = #{mb_id} AND sellingrisk_type = 'I') tb3
+                          ON tb2.mb_id = tb3.mb_id
+                         AND tb2.insco_cd = tb3.insco_cd
+                         AND tb2.inspol_no = tb3.inspol_no
+                       WHERE tb1.mb_id = #{mb_id}
+                         AND tb1.com_ym = #{com_ym}
+                         AND tb1.emp_cd NOT IN ('SADMIN', 'ADMIN', 'INSCOM', 'INSCOMNVL')
+                       GROUP BY tb1.mb_id, tb1.com_ym, tb1.scd
+                     ) tb2
+                ON tb1.mb_id = tb2.mb_id
+               AND tb1.com_ym = tb2.com_ym
+               AND tb1.scd = tb2.scd
+             WHERE tb1.mb_id = #{mb_id}
+               AND tb1.com_ym = #{com_ym}
+             UNION ALL
+            SELECT tb3.mb_id
+                 , tb3.com_ym
+                 , tb3.scd
+                 , tb3.pscd
+                 , tb4.RECRUIT_CNT
+                 , tb4.CANCEL_CNT
+              FROM tbin_scd_month tb3
+              JOIN incomplete_cte tb4
+                ON tb3.scd = tb4.pscd
+             WHERE tb3.mb_id = #{mb_id}
+               AND tb3.com_ym = #{com_ym}
+             )
+        SELECT tb1.mb_id
+             , tb1.com_ym
+             , tb1.scd
+             , tb2.RECRUIT_CNT
+             , tb2.CANCEL_CNT
+             , CASE
+                   WHEN tb2.CANCEL_CNT = 0 THEN 0
+                   WHEN tb2.RECRUIT_CNT = 0 THEN 100
+                   ELSE tb2.CANCEL_CNT / tb2.RECRUIT_CNT * 100
+               END AS IS_RATE
+          FROM org_month_cte tb1
+          JOIN (SELECT tb1.mb_id
+                     , tb1.com_ym
+                     , tb1.scd
+                     , SUM(tb1.RECRUIT_CNT) AS RECRUIT_CNT
+                     , SUM(tb1.CANCEL_CNT) AS CANCEL_CNT
+                  FROM incomplete_cte tb1
+                 GROUP BY tb1.mb_id, tb1.com_ym, tb1.scd
+               ) tb2
+            ON tb1.mb_id = tb2.mb_id
+           AND tb1.com_ym = tb2.com_ym
+           AND tb1.scd = tb2.scd
+         WHERE tb1.mb_id = #{mb_id}
+           AND tb1.com_ym = #{com_ym}
+	</select>
+	
+	<select id="selectErpContractShareHistList" parameterType="kr.co.gnx.erp.ErpVO" resultType="hmap">
+		/* erp-mapper.xml id="selectErpContractShareHistList" 수금이관 데이터 가져오기 */
+		SELECT tb1.mb_id
+			 , tb1.com_ym
+			 , tb1.insco_cd
+			 , tb1.inspol_no
+			 , tb1.mo_cd
+			 , tb1.before_emp_cd
+			 , tb1.after_emp_cd
+			 , tb1.share_idx
+			 , tb1.share_rate
+		  FROM (SELECT tb1.*
+				  FROM (SELECT ROW_NUMBER() OVER(PARTITION BY tb1.insco_cd, tb1.inspol_no, tb1.share_idx ORDER BY tb1.seq DESC) AS rn
+				             , tb1.mb_id
+				             , #{com_ym} AS com_ym
+				             , tb1.insco_cd
+				             , tb1.inspol_no
+				             , tb1.mo_cd
+				             , tb1.before_emp_cd
+				             , tb1.after_emp_cd
+				             , tb1.share_idx
+				             , tb1.fees_ratio AS share_rate
+				          FROM tbcn_contract_share_hist tb1
+				         WHERE tb1.mb_id = #{mb_id}
+				           AND DATE_FORMAT(tb1.in_dtm, '%Y%m') = #{com_ym}
+				       ) tb1
+				 WHERE tb1.rn = 1
+		  	   ) tb1
+		  JOIN tbcn_contract tb2
+		    ON tb1.mb_id = tb2.mb_id
+		   AND tb1.insco_cd = tb2.insco_cd
+		   AND tb1.inspol_no = tb2.inspol_no
+		   AND tb2.mb_id = #{mb_id}
+		   AND tb2.cont_date >= '2022-06-01'
+	</select>
+	
+    <!--****************************************** ERP 데이터 가져오는 부분 END ******************************************-->
+    
+    <select id="selectUserView" parameterType="kr.co.gnx.erp.ErpVO" resultType="bmap">
+        /* erp-mapper.xml id="selectUserView" 설계사 정보조회 */
+        SELECT TB1.mb_id
+             , TB1.mb_nm
+             , TB1.mb_login_id
+             , TB2.login_id AS user_id
+             , TB2.emp_cd
+             , TB4.emp_nm
+             , TB2.user_pwd AS password
+             , TB3.role_id
+             , CASE WHEN concurrent_idx = 1 THEN TB4.jikgub
+                       ELSE TB3.jikgub
+                   END AS jikgub
+             , CASE WHEN concurrent_idx = 1 THEN TB4.jikchk
+                       ELSE TB3.jikchk
+                   END AS jikchk
+             , CASE WHEN concurrent_idx = 1 THEN TB4.scd
+                       ELSE TB3.scd
+                   END AS scd
+             , CASE WHEN concurrent_idx = 1 THEN TB5.snm
+                       ELSE TB6.snm
+                   END AS snm
+             , TB4.hpno
+             , TB4.telno
+             , TB4.extno
+             , TB4.email
+             , TB4.empsta
+             , TB4.pay_gbn
+             , TB2.pwd_intzn_type
+             , TB2.acct_lock_type
+             , TB1.pkg_name
+             , TB3.concurrent_idx
+             , TB2.login_autr_type
+             , DATE_FORMAT(NOW(), '%Y-%m-%d %T') AS login_time
+             , TB1.logo_url
+             , TB1.copy_right
+             , IFNULL(TB1.session_time, 30) AS session_time
+             , 'CMS4' AS project_type
+          FROM (SELECT * FROM tbsy_member WHERE mb_login_id = UPPER(#{mb_id})) TB1
+    INNER JOIN (SELECT * FROM tbsy_login WHERE login_id = 'sum') TB2
+            ON TB1.mb_id = TB2.mb_id
+    INNER JOIN (SELECT * FROM tbsy_user_role_map WHERE mb_id = UPPER(#{mb_id}) AND concurrent_idx = #{concurrent_idx}) TB3
+            ON TB1.mb_id = TB3.mb_id
+              AND TB2.emp_cd = TB3.emp_cd
+    INNER JOIN (SELECT * FROM tbin_empmst WHERE mb_id = UPPER(#{mb_id})) TB4
+            ON TB1.mb_id = TB4.mb_id
+           AND TB2.emp_cd = TB4.emp_cd
+    INNER JOIN (SELECT * FROM tbin_scd WHERE mb_id = UPPER(#{mb_id})) TB5
+            ON TB1.mb_id = TB5.mb_id
+           AND TB4.scd = TB5.scd
+    LEFT OUTER JOIN (SELECT * FROM tbin_scd WHERE mb_id = UPPER(#{mb_id})) TB6
+            ON TB1.mb_id = TB6.mb_id
+           AND TB3.scd = TB6.scd
+    </select>
+    
+    <select id="selectErpRoleList" parameterType="kr.co.gnx.erp.ErpVO" resultType="bmap">
+        /* erp-mapper.xml id="selectErpRoleList" ERP 권한 목록 조회 */
+        SELECT mb_id            /* 회사코드   VARCHAR2(20) */
+             , role_id          /* 권한ID     VARCHAR2(50) */
+             , REPLACE(role_id, 'ROLE_', '') AS replace_role_id     /* 권한ID     VARCHAR2(50) */
+             , role_nm          /* 권한명     VARCHAR2(50) */
+             , login_autr_type  /* 로그인 인증 초기 설정 VARCHAR2(1)  */
+             , in_emp_cd        /* 입력자사번 VARCHAR2(20) */
+             , DATE_FORMAT(in_dtm, '%Y-%m-%d %T') AS in_dtm         /* 입력일시   TIMESTAMP    */
+             , up_emp_cd        /* 수정자사번 VARCHAR2(20) */
+             , DATE_FORMAT(up_dtm, '%Y-%m-%d %T') AS up_dtm         /* 수정일시   TIMESTAMP    */
+          FROM tbsy_roles_map /* [SY][시스템] 롤마스터 */
+         WHERE mb_id = #{mb_id}
+         <if test='@kr.co.gnx.comm.util.CommUtil@isNotEquals(in_emp_cd, "SADMIN")'>
+           AND role_id != 'ROLE_0'
+         </if>
+         ORDER BY CAST(REPLACE(role_id, 'ROLE_', '') AS UNSIGNED)
+    </select>
+    
+    <select id="selectErpRolesHierarchyView" parameterType="hmap" resultType="bmap">
+        /* role-mapper.xml id="selectErpRolesHierarchyView" ERP에서 해당 권한이 있는지 조회 */
+        <include refid="Comm.ErpRolesHierarchyTree"/>
+        SELECT chld_role_id as name
+          FROM hierarchy_cte
+         WHERE chld_role_id = #{check_role_id}
+    </select>
+    
+    <select id="selectErpUserRoleListCount" parameterType="kr.co.gnx.erp.ErpVO" resultType="int">
+        /* erp-mapper.xml id="selectErpUserRoleListCount" ERP 사용자 권한 메핑 겸직여부 조회  */
+        SELECT COUNT(emp_cd) AS concurrent_gubun
+          FROM tbsy_user_role_map
+         WHERE mb_id = #{mb_id}
+           AND emp_cd = #{emp_cd}
+         GROUP BY mb_id, emp_cd
+    </select>
+    
+    <select id="selectEmpSchList" parameterType="kr.co.gnx.erp.ErpVO" resultType="bmap">
+        /* erp-mapper.xml id="selectEmpSchList" ERP 인사목록 조회(권한사원 변경용)  */
+        WITH recursive org_cte
+          AS (SELECT 1 AS level
+                   , CONCAT(tb2.sort_no,tb2.snm) AS ordersb
+                   , CONCAT(' > ',CAST(tb2.scd AS CHAR (509))) AS scdpath
+                   , CONCAT(' > ',CAST(tb2.snm AS CHAR (509))) AS snmpath
+                   , tb2.mb_id
+                   , tb2.scd             /* 조직코드       VARCHAR(20)  */
+                   , tb2.snm             /* 조직명         VARCHAR(50)  */
+                   , tb2.pscd            /* 상위조직코드   VARCHAR(20)  */
+                   , tb2.org_unit_gbn    /* 조직단위구분   VARCHAR(10)  */
+                   , tb2.org_unit_detail_gbn    /* 조직 단위 상세 구분   VARCHAR(10)  */
+                   , tb2.org_strt_ymd    /* 조직생성년월일 VARCHAR(10)  */
+                   , tb2.org_end_ymd     /* 조직폐쇄년월일 VARCHAR(10)  */
+                   , tb2.scd_head        /* 조직장         VARCHAR(10)  */
+                   , tb2.org_mng_gbn     /* 영업조직여부   VARCHAR(1)   */
+                   , tb2.use_yn          /* 사용여부       VARCHAR(1)   */
+                   , tb2.sort_no         /* 정렬순서       BIGINT       */
+                   , tb2.memo            /* 비고           VARCHAR(200) */
+                FROM (SELECT *
+                        FROM tbin_scd tb1
+                       WHERE mb_id = #{mb_id}
+                         AND pscd IS NULL
+                     ) tb2
+               UNION ALL
+              SELECT level+1 AS level
+                   , CONCAT(org_cte.ordersb,LPAD(tb3.sort_no,4,'0'),tb3.snm) AS ordersb
+                   , CONCAT(scdpath,' > ',tb3.scd) AS scdpath
+                   , CONCAT(snmpath,' > ',tb3.snm) AS snmpath
+                   , tb3.mb_id
+                   , tb3.scd             /* 조직코드       VARCHAR(20)  */
+                   , tb3.snm             /* 조직명         VARCHAR(50)  */
+                   , tb3.pscd            /* 상위조직코드   VARCHAR(20)  */
+                   , tb3.org_unit_gbn    /* 조직단위구분   VARCHAR(10)  */
+                   , tb3.org_unit_detail_gbn    /* 조직 단위 상세 구분   VARCHAR(10)  */
+                   , tb3.org_strt_ymd    /* 조직생성년월일 VARCHAR(10)  */
+                   , tb3.org_end_ymd     /* 조직폐쇄년월일 VARCHAR(10)  */
+                   , tb3.scd_head        /* 조직장         VARCHAR(10)  */
+                   , tb3.org_mng_gbn     /* 영업조직여부   VARCHAR(1)   */
+                   , tb3.use_yn          /* 사용여부       VARCHAR(1)   */
+                   , tb3.sort_no         /* 정렬순서       BIGINT       */
+                   , tb3.memo            /* 비고           VARCHAR(200) */
+                FROM (SELECT *
+                        FROM tbin_scd
+                       WHERE mb_id = #{mb_id}
+                     ) tb3
+                JOIN org_cte
+                  ON tb3.mb_id = org_cte.mb_id
+                 AND tb3.pscd = org_cte.scd
+             )
+      SELECT tb1.seq                  /* 일련번호 bigint(20)*/
+           , tb1.mb_id                /* 회사코드 varchar(20)*/
+           , tb1.emp_cd               /* 사원코드 varchar(20)*/
+           , tb1.emp_nm               /* 사원명 varchar(20)*/
+           , tb1.emp_nme              /* 영문명 varchar(50)*/
+           , tb1.scd                  /* 조직코드 varchar(20)*/
+           , tb2.snm
+           , CASE
+                 WHEN tb2.pscd IS NULL THEN tb2.snm
+                 ELSE SUBSTRING(SUBSTRING(tb2.snmpath, 4), CHAR_LENGTH(fn_get_pathroot(SUBSTRING(tb2.snmpath,4), ' > ', 1)) + 4)
+             END AS snmpath
+           , tb1.jikgub               /* 직급코드 varchar(20)*/
+           , tb3.cd_vl_nm AS jikgub_nm
+           , tb1.jikchk               /* 직책코드 varchar(20)*/
+           , tb4.cd_vl_nm AS jikchk_nm
+           , tb1.empsta               /* 재직여부 varchar(20)*/
+           , tb5.cd_vl_nm AS empsta_nm
+           , tb1.ent_ymd              /* 입사일자 varchar(10)*/
+           , tb1.gent_ymd             /* 위촉일자 varchar(10)*/
+           , tb1.reentry_ymd          /* 재입사일자 varchar(10)*/
+           , tb1.end_ymd              /* 퇴사일자 varchar(10)*/
+           , tb1.out_ymd              /* 해촉일자 varchar(10)*/
+           , tb6.role_id
+           , tb7.role_nm
+        FROM tbin_empmst tb1
+   LEFT JOIN org_cte tb2
+          ON tb1.mb_id = tb2.mb_id
+         AND tb1.scd = tb2.scd
+   LEFT JOIN tbcm_common_code tb3
+          ON tb1.mb_id = tb3.mb_id
+         AND tb1.jikgub = tb3.cd_vl
+         AND tb3.grp_cmm_cd = 'JIKGUB'
+   LEFT JOIN tbcm_common_code tb4
+          ON tb1.mb_id = tb4.mb_id
+         AND tb1.jikchk = tb4.cd_vl
+         AND tb4.grp_cmm_cd = 'JIKCHK'
+   LEFT JOIN tbcm_common_code tb5
+          ON tb1.mb_id = tb5.mb_id
+         AND tb1.empsta = tb5.cd_vl
+         AND tb5.grp_cmm_cd = 'EMPSTA'
+   LEFT JOIN tbsy_user_role_map tb6
+          ON tb1.mb_id = tb6.mb_id
+         AND tb1.emp_cd = tb6.emp_cd
+         AND tb6.concurrent_idx = 1
+   LEFT JOIN tbsy_roles_map tb7
+          ON tb6.mb_id = tb7.mb_id
+         AND tb6.role_id = tb7.role_id
+       WHERE tb1.mb_id = #{mb_id}
+         AND tb1.emp_cd NOT IN (<include refid="Comm.RoleExcepcion" />)
+    <if test="@kr.co.gnx.comm.util.CommUtil@isNotEmpty(search_word)">
+         AND ( tb1.emp_nm LIKE CONCAT('%',#{search_word},'%')
+            OR tb1.emp_cd LIKE CONCAT('%',UPPER(#{search_word}),'%')
+             )
+    </if>
+       ORDER BY tb1.emp_cd
+    </select>
+
+    <select id="selectErpEmpEduTrainingMonthList" parameterType="kr.co.gnx.erp.ErpVO" resultType="bmap" >
+			SELECT tb1.mb_id
+				 , #{com_ym} AS com_ym
+				 , tb1.jigub_com_ym
+				 , tb1.mo_cd AS emp_cd
+				 , TIMESTAMPDIFF(MONTH, CONCAT(SUBSTRING(tb2.ent_ymd, 1, 8), '01'), DATE_FORMAT(CONCAT(tb1.jigub_com_ym, '01'), '%Y-%m-%d')) + 1 AS ent_chawol
+				 , tb1.gent_chawol AS gent_chawol
+				 , tb2.empsta
+				 , SUM(IFNULL(tb1.hwan, 0)) AS LIFE_GA_HWAN
+				 , CASE
+					   WHEN SUM(IFNULL(tb1.hwan, 0)) >= 300000 THEN 1000000
+					   WHEN SUM(IFNULL(tb1.hwan, 0)) <![CDATA[<]]> 300000 AND SUM(IFNULL(tb1.hwan, 0)) >= 100000 THEN 500000
+					   ELSE 0
+				   END AS jigub_amt
+			  FROM (SELECT tb1.*
+						 , DATE_FORMAT(DATE_ADD(CONCAT(#{com_ym}, '01'), INTERVAL 1 MONTH), '%Y%m') AS jigub_com_ym
+						 , TIMESTAMPDIFF(MONTH, CONCAT(SUBSTRING(IFNULL(NULLIF(tb2.gent_ymd, ''), tb2.ent_ymd), 1, 8), '01'), DATE_FORMAT(CONCAT(#{com_ym}, '01'), '%Y-%m-%d')) + 1 AS gent_chawol
+					  FROM tbcn_contract tb1
+		   LEFT OUTER JOIN tbin_empmst tb2
+						ON tb1.mb_id = tb2.mb_id
+					   AND tb1.mo_cd = tb2.emp_cd
+					 WHERE tb1.mb_id = #{mb_id}
+					   AND tb1.cont_date LIKE CONCAT(DATE_FORMAT(DATE_ADD(CONCAT(#{com_ym}, '01'), INTERVAL 1 MONTH), '%Y-%m'), '%')
+					   AND tb1.insco_cd LIKE 'L%'
+					   AND tb1.cont_status = '정상'
+					   AND tb1.napmethod = '월납'
+					   AND IFNULL(tb2.end_ymd, '') = '') tb1
+   LEFT OUTER JOIN tbin_empmst tb2
+				ON tb1.mb_id = tb2.mb_id
+			   AND tb1.mo_cd = tb2.emp_cd
+			 WHERE tb1.mb_id = #{mb_id}
+			   AND tb1.gent_chawol = 1
+		  GROUP BY tb1.mb_id, tb1.mo_cd
+    </select>
+
+    <select id="selectProductgroupKind2" parameterType="kr.co.gnx.system.commoncode.CommonCodeVO" resultType="kr.co.gnx.system.commoncode.CommonCodeVO">
+        /* erp-mapper.xml selectProductgroupKind2 상품구분2 조회 (dropDownList) */
+        SELECT prod_kind2 AS prod_kind2
+             , prod_kind2 AS prod_kind2_nm
+             , CONCAT(insco_type, seq) AS prod_kind2_gubun
+             , insco_type
+          FROM tbcn_product_group
+         WHERE mb_id = #{mb_id}
+           AND use_yn = 'Y'
+        <if test="@kr.co.gnx.comm.util.CommUtil@isNotEmpty(srch_insco_type)">
+            AND insco_type = #{srch_insco_type}
+        </if>
+        <if test="@kr.co.gnx.comm.util.CommUtil@isNotEmpty(srch_prod_kind1)">
+            AND prod_kind1 = #{srch_prod_kind1}
+        </if>
+    </select>
+
+</mapper>

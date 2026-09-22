@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemesh>
+    
+    <mapping path="/*.do" decorator="/WEB-INF/sitemesh/layout.jsp"/>
+    <mapping path="/*.go" decorator="/WEB-INF/sitemesh/layout.jsp"/>
+    <mapping path="/*.pop" decorator="/WEB-INF/sitemesh/layoutPop.jsp"/>
+   	
+   	
+   	
+    
+    <mapping path="/login.go" exclude="true"/>
+    <mapping path="/comm/*" exclude="true"/>
+    <mapping path="/html/*" exclude="true"/>
+    <mapping path="/fonts/*" exclude="true"/>
+    <mapping path="/css/*" exclude="true"/>
+    <mapping path="/js/*" exclude="true"/>
+    <mapping path="/images/*" exclude="true"/>
+    <mapping path="/**.ajax" exclude="true"/>
+    <mapping path="/**/**.ajax" exclude="true"/>
+    <mapping path="/files/*" exclude="true"/> 
+	<mapping path="/base/*" exclude="true"/>
+	<mapping path="/ubi4/*" exclude="true"/>
+</sitemesh>

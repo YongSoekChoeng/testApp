@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	                    http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+	                    http://www.springframework.org/schema/tx
+	                    http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+	                    http://www.springframework.org/schema/util
+	                    http://www.springframework.org/schema/util/spring-util-4.3.xsd
+	                    http://www.springframework.org/schema/aop
+	                    http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+
+	<!-- myBATIS -->
+	<!-- 원본은 Oracle(dataSource) / MariaDB-ANYBIZ(dataSource-ANYBIZ) / MariaDB-RELAY(dataSource-RELAY) 이렇게
+	     세 개의 SqlSessionFactory로 나뉘어 있었다. 이 테스트 프로젝트는 로컬 MySQL 하나로 합쳤으므로
+	     sqlSessionFactory 하나만 만들고, sqlSession/sqlSessionAnybiz 두 SqlSessionTemplate이 그 하나를
+	     같이 쓰도록 했다(Java 코드의 getSqlSession()/getSqlSessionAnybiz() 호출부는 그대로 둔다). -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	    <property name="dataSource"      ref="dataSource"></property>
+	    <property name="configLocation"  value="classpath:/sqlmap/SqlMapConfig.xml"></property>
+	    <property name="mapperLocations" value="classpath*:/sqlmap/mapper/**/*-mapper.xml"></property>
+	</bean>
+
+	<!-- 원본은 sqlSession(Oracle)만 BATCH executor를 썼는데, 그때는 Oracle/ANYBIZ가 서로 다른
+	     데이터소스라 문제가 없었다. 지금은 같은 데이터소스를 sqlSession/sqlSessionAnybiz 둘이
+	     공유하므로, 한 트랜잭션 안에서 서로 다른 ExecutorType을 쓰면 MyBatis-Spring이
+	     "Cannot change the ExecutorType when there is an existing transaction" 오류를 낸다.
+	     그래서 둘 다 기본(SIMPLE) executor로 맞췄다. -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+
+	<bean id="sqlSessionAnybiz" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory" />
+	</bean>
+</beans>

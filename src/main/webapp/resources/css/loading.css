@@ -1,0 +1,63 @@
+@charset "utf-8";
+html {
+  height: 100%;box-sizing: border-box;
+}
+new-wrapper {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -moz-box-align: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -moz-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  background-image: radial-gradient(circle farthest-corner at center, #003f7a 0%, #000000 100%);
+}
+
+h1 {
+  /* 충돌나는 부분 제거 */
+  /* color: rgba(255, 255, 255, 0.3);
+  font: 900 800% Baskerville, 'Palatino Linotype', Palatino, serif; */
+}
+
+@-webkit-keyframes loading {
+  from {
+    max-width: 0;
+  }
+}
+@-moz-keyframes loading {
+  from {
+    max-width: 0;
+  }
+}
+@-ms-keyframes loading {
+  from {
+    max-width: 0;
+  }
+}
+@keyframes loading {
+  from {
+    max-width: 0;
+  }
+}
+h1:before {
+  content: attr(data-content);
+  position: absolute;
+  overflow: hidden;
+  max-width: 100%;
+  color: rgba(128, 128, 128, 0.6);
+  -webkit-animation: loading 2s linear infinite;
+  -moz-animation: loading 2s linear infinite;
+  -ms-animation: loading 2s linear infinite;
+  animation: loading 2s linear infinite;
+}

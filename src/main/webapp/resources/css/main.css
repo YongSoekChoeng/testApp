@@ -1,0 +1,90 @@
+/* =================================  메인  ================================= */
+.main_wrap {width: 100%;background: #ddd;display: block;height: 280px; background:url(/resources/images/common/main_bg01.jpg) no-repeat 0 0;text-indent: -9999em;background-size: auto 280px;}
+.main_box01 {width: 1000px; display: block;/*margin:0 auto ;*/height: 300px;margin-left: 50px}
+.main_box01 li {width:300px; height: 300px; background:#f6f6f6;
+    -webkit-box-shadow: -1px 10px 40px 0px rgba(0,0,0,0.4);-moz-box-shadow: -1px 10px 40px 0px rgba(0,0,0,0.4);box-shadow: -1px 10px 40px 0px rgba(0,0,0,0.4); 
+float: left;margin-right: 25px; box-sizing: border-box;padding:20px;}
+.main_box01 li p {width: 100%; font-size: 18px;font-family:'Nanum Square' !important;font-weight: bold; border-bottom: 2px solid #222; letter-spacing: -2px; color: #222; padding-bottom: 12px}
+.main_box01 li p a {font-size: 12px; float: right; letter-spacing: -1px; padding-top: 5px}
+.main_box01 dl {width: 100%;}
+.main_box01 li dl dd {width: 100%; border-bottom: 1px solid #ccc; height: 54px; box-sizing: border-box;padding-top: 10px; color: #222;text-overflow:ellipsis;
+white-space:nowrap;
+word-wrap:normal;
+overflow:hidden;}
+.main_box01 li dl dd.boardTitleBox span {display: block;font-size: 11px !important;color:#999;padding-bottom: 6px}
+.main_box01 li dl dd.scheduleTitleBox span {display: inline-block; padding-bottom: 6px}
+.main_box01 li dl dd b {width: 220px; color: #333;text-overflow:ellipsis; font-size: 14px;padding-bottom: 0 !important;display: inline-block;font-weight: normal;
+white-space:nowrap;
+word-wrap:normal;
+overflow:hidden;}
+.main_box01 li dl dd a {float: right;background:transparent url(/resources/images/common/btn_down.png) no-repeat 0 0;width: 24px; height: 24px; display: inline-block;text-indent: -99999px;margin-top: -3px;}
+.main_box01 li dl dd a:hover {background:#ddd url(/resources/images/common/btn_down.png) no-repeat 0 0;}
+
+.imgsty01 {border-radius: 2px; width: 300px; height: 300px;}
+.imgsty02 {border-radius: 2px; width: 300px; height: 150px;}
+.imgsty03 {border-radius: 2px; width: 300px; height: 100px;}
+.imgsty04 {border-radius: 2px; width: 148.5px; height: 150px;}
+.imgsty06 {border-radius: 2px; width: 148.5px; height: 100px;}
+
+.imgsty_insco03 {width: 80px;}
+
+.main_sty01 {display: inline-block;width: 1350px;}
+.main_sty02 {width: 1000px; float: left;margin-top: -230px;display: inline-block;}
+.main_box02 {
+  width:250px;
+  height: 625px;
+  background:#f6f6f6;
+  margin-top: -230px;
+  margin-left: 25px;
+  -webkit-box-shadow: -1px 10px 40px 0px rgba(0,0,0,0.4);
+  -moz-box-shadow: -1px 10px 40px 0px rgba(0,0,0,0.4);
+  box-shadow: -1px 10px 40px 0px rgba(0,0,0,0.4);
+  float: left;
+  box-sizing: border-box;
+  padding: 0;
+  border: 1px solid #fff;
+  border-radius: 2px;
+  overflow: auto;}
+
+/* 메인에 table */
+.table_st1 {width: 100%; border-top:1px solid #bbb;border-collapse: collapse;}
+.table_st1 th {background:#eee; color:#000;white-space:nowrap;height: 32px; border-bottom:1px solid #ccc; border-right: 1px solid #ccc;text-align:center;}
+.table_st1 td { border-bottom:1px solid #ccc ;border-right:1px solid #ccc;text-align:right;height:32px;padding:2px 4px; box-sizing: border-box;color:#666;}
+.table_st2 {width: 100%; /*border-top:1px solid #bbb;*/border-collapse: collapse;}
+.table_st2 th {background:#fff; color:#000;white-space:nowrap;border-bottom:1px solid #ccc; border-right: 1px solid #ccc;text-align:center;font-size: 12px}
+.table_st2 td { background:#f6f6f6;border-bottom:1px solid #ccc ;border-right:1px solid #ccc;padding:7px 8px 3px 8px; box-sizing: border-box;color:#666;font-size: 12px}
+.br0 {border-right:0px !important;}
+.bt0 {border-top:0px !important;}
+.ttxt01 {font-size: 11px;float: right;padding-top: 7px;color: #999;letter-spacing: 0px;}
+/*메인에 TAB*/
+main {width: 100%; display: inline-block;margin-top: 5px}
+section {
+  display: none;
+  padding-top:0;
+  border-top: 1px solid #ccc;
+}
+main input {
+  display: none;
+}
+main label {
+  display: inline-block;
+  padding: 4px 0;
+  text-align: center;
+  color: #666;
+  width: 20%;
+  background: #ddd;
+}
+main label:hover {
+  color: #789;
+  cursor: pointer;
+}
+main input:checked + label {
+  color: #fff;
+  background:#aaa;
+}
+
+#tab1:checked ~ #content1,
+#tab2:checked ~ #content2,
+#tab3:checked ~ #content3{
+  display: block;
+}

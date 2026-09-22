@@ -1,0 +1,339 @@
+@charset "utf-8";
+
+/* ==================== GOLBAL ==================== */
+*{margin:0;padding:0;font-family:NanumGothic, dotum,'돋움', Gulim, Arial, Verdana, AppleGothic, sans-serif;}
+body{background-color:#fff;color:#666;font-size:12px;line-height:120%;}
+
+ul, ol, li{list-style:none; }
+img, hr{border:none;}
+img{vertical-align:top; border:0px ;}
+
+
+/* Link Style */
+a:link{text-decoration:none; }
+a:visited{text-decoration:none; }
+a:active{text-decoration:none; }
+
+/* Table Style */
+table{border-collapse:collapse;  border-spacing:0; table-layout:fixed; }
+table td img{vertical-align:middle;}
+
+/* tag all font-size set */
+a,em,span { color:inherit;  font-family:inherit; font-size:inherit; line-height: inherit; }
+
+/* From Style */
+textarea{padding:5px; border: solid 1px #bdbdbd; background-color:#fff;}
+input{vertical-align:middle;}
+input.txt,
+input.text,
+input.it{height: 22px; line-height:23px; border: solid 1px #bdbdbd; background-color:#fff;}
+input.chk{}
+input.radio{}
+select          {height: 24px; line-height:24px; border: solid 1px #bdbdbd; background-color:#fff;vertical-align:middle;}
+hr, caption     {display:none;}
+legend          {position:absolute; height:0; font-size:0px; line-height:0; overflow:hidden; text-indent:-20000px; }
+address,cite,em {font-style:normal;}
+fieldset        {border:0; padding:0; }
+label           {cursor:pointer;}
+
+body{word-wrap:break-word;-webkit-text-size-adjust:none; background-color: #fff}
+img, fieldset, button{border:none;}
+caption{visibility:hidden;line-height:0;}
+li, dl, dt, dd{list-style:none;}
+textarea{overflow:auto;} 
+legend{position:absolute;top:0;left:0;width:0;height:0;overflow:hidden;visibility:hidden;font-size:0;line-height:0;} /* For Screen Reader */ 
+
+/* Color */
+.col_blue{color:#0084ff !important;}
+
+/* 메뉴 */
+
+/* Button */
+
+.button,
+.button *{ color:#fff; position:relative; margin:0; padding:0; display:-moz-inline-stack; display:inline-block; text-decoration:none !important; border:0; font-size:12px; 
+ font-weight:bold; white-space:nowrap; background:url(../images/button.gif) no-repeat; vertical-align:top; overflow:visible;}
+.button { margin-right:4px;}
+.button *{ left:4px; cursor:pointer; _cursor:hand;}
+.button.default, .button.default *{ height:24px; line-height:24px;background-position:left 0;}
+.button.default *{ padding:0 15px 0 10px; background-position:right top;}
+.button.end, .button.end *{ height:24px; line-height:24px;background-position:left -30px;float:right;}
+.button.end *{ padding:0 15px 0 10px; background-position:right -30px;}
+
+.button *:hover,
+.button *:active,
+.button *:focus{ color:#ececec ;font-weight:bold;}
+
+/* ==================== 2014 08 06 ==================== */
+.k-treeview.k-widget {
+    color:#fff !important;
+    line-height: 20px ;
+}
+
+.k-treeview .k-icon{
+	background-color: white !important; 
+}
+
+/* ==================== Layout ==================== */
+#container{position:relative;width:100%;} /* 백그라운드 CI 작업시 사용 */
+
+#contents {
+   /* position: relative;*/
+    /* padding-bottom: 20px; */
+    mrgin-botoom:0px;
+    padding-bottom:0px;
+    padding-top:20px;
+    border: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 220px;
+    padding-right: 20px;
+    min-width: 1125px;
+    border-top:1px solid #bdbdbd;
+}
+
+#footer{position:fixed;width:100%;height:24px;background-color:#e5e5e5;bottom:0;background:none rgba(205, 205, 205, 0.42)}
+#footer p{text-align:center;padding-top:5px;font-size:11px;color:#999;font-family:Tahoma;padding-left:75px;}
+
+/* ==================== Title ==================== */
+h1  {height:45px;}
+h2  {font-family: "dotum", Arial, sans-serif; font-size:16px; color:#000; font-weight:bold;margin-top:30px;margin-bottom:20px;}
+h3  {font-family: "dotum", Arial, sans-serif; font-size:16px; color:#000; font-weight:bold;margin-top:30px;margin-bottom:20px;letter-spacing:-1px;}
+
+/* ==================== hr ==================== */
+.h15 {display:block;height:15px;}
+.h20 {display:block;height:20px;}
+.h25 {display:block;height:25px;}
+.h30 {display:block;height:30px;}
+
+/* ==================== Header ==================== */
+#header {position:relative;height:75px;z-index:100;background-color: #ffffff;border-bottom:1px solid #bdbdbd;}
+#header .logo{position:absolute;left:0;top:4px;font-size:12px;font-weight:bold;color:#e7e7e7;width:185px;margin-left:5px; display: inline-block;}
+#header div{position:absolute;width: 100%;}
+#header .info{position:absolute;right:0;top:13px;float: right;margin-right: 240px}
+#header .info2{position:absolute;right:0;top:0px;float: right;margin-right: 10px}
+#header .info .admin{color:#000;} /*#00c0ff*/
+#header a{color:#222; padding-top: 5px; display: inline-block;}/*#e7e7e7*/
+#header a:hover { text-decoration: none; }
+#header .info li{color:#3755A0;font-size:11px;float:left;margin-left:10px;}/*#e7e7e7*/
+#header .info2 li{color:#3755A0;font-size:11px;float:left;margin-left:5px;margin-top:7px;}/*#e7e7e7*/
+
+/* ==================== search ==================== */
+.search {width:100%; border: 1px solid #cdced0;background: -moz-linear-gradient(#f8fafc, #ebedf0); /* For Firefox 3.6 to 15 */  background: linear-gradient(#f8fafc, #ebedf0); /* Standard syntax (must be last) */  border-radius: 2px; box-shadow:0px 2px 2px #eee;box-sizing:border-box;}
+#search {background:url(/images/search_bg_top.jpg) no-repeat left top;width:100%;padding-top:2px;}
+#search .se_bg {background:url(/images/search_bg_3.jpg) no-repeat left bottom;padding-bottom:4px;}
+#search .se_bg table {margin:10px 20px 10px 20px;}
+#search .se_bg table tr th {padding-right:10px;height:28px;font-weight:normal;text-align:left;color:#222;}
+#search .se_bg table tr td {padding-right:15px;}
+#search .se_bg table tr td.line {width:2px;background:url(../images/img_search_line.png) repeat-y;padding-right:10px;text-indent:-9999px;}
+
+/* ==================== grid ==================== */
+#refer {font-size:11px;margin-top:15px;background:url(../images/bullet_star.png) repeat-y 0px 2px;padding-left:15px;line-height:140%;color:#777;}
+#search_above {padding-bottom:5px;font-size:11px;color:#999;}
+
+#grid {width:100% !important;}
+
+/* ==================== Tab ==================== */
+
+#tab_bro{width:100%;height:41px;background-color:#f0f0f0;}
+#tab_bro .tab{padding-top:10px;position:relative;left:205px;width:1125px;}
+#tab_bro .tab ul li {letter-spacing:-1px;font-weight:bold;height:20px;padding:8px 3px 0 17px;float:left;width:auto;text-align:center;border-top:1px solid #5f676f;border-right:1px solid #5f676f;border-left:1px solid #5f676f;border-bottom:1px solid #bfc5cb;background:#fff;z-index:1000;position: relative;}
+#tab_bro .tab ul li a{padding-right:10px;}
+#tab_bro .tab ul li:hover {color:#000;}
+#tab_bro .tab ul li span {float:right;margin-right:auto;margin-top:0px;}
+#tab_bro .tab ul li.sel{background: #ffffff;height:23px;color: #000;font-size:13px;font-weight:bold;border-left: 1px solid #bdbdbd;border-right: 1px solid #9f9f9f;border-top: 3px solid #3158b9;border-bottom: 1px solid #fff;z-index:1000;position: relative;border-radius:2px;margin-top:-2px;}
+#tab_bro .tab ul li.sel span {float:right;padding:0px 0px 0 5px;}
+#tab_bro .tab ul li.sel:hover {color:#000;}
+/* #tab_bro .tab ul li.sel img{filter:invert();} */
+
+/* 좌측 메뉴 디자인 */
+.menulist_2 > a,
+.menulist_2 > a::before,
+.menulist_2 > a::after {
+  box-sizing: border-box;
+}
+
+img {
+  vertical-align: middle;
+  border-style: none;
+}
+
+.align-items-center {
+  -webkit-box-align: center !important;
+  -ms-flex-align: center !important;
+  align-items: center !important;
+}
+
+.justify-content-center {
+  -webkit-box-pack: center !important;
+  -ms-flex-pack: center !important;
+  justify-content: center !important;
+}
+
+.d-flex {
+  display: -webkit-box !important;
+  display: -ms-flexbox !important;
+  display: flex !important;
+}
+
+.flex-row {
+  -webkit-box-orient: horizontal !important;
+  -webkit-box-direction: normal !important;
+  -ms-flex-direction: row !important;
+  flex-direction: row !important;
+}
+
+.collapse {
+  display: none;
+}
+
+/* ==================== gnb ==================== */
+/* 좌측 메뉴 디자인 변경으로 주석 처리 */
+/* #gnb{
+	position:fixed;
+	left:0px;
+	top:75px;
+	width:185px;
+	height: 100%;
+	background-color: #fff;
+	border-right: 1.2px solid #333;
+	overflow-y: auto;
+	z-index:99;
+}
+#gnb .menulist_2 {
+	line-height: 26px;
+	background-color: #daefff;
+	border-bottom : 1px solid #dcdcdc;
+}
+
+#gnb .menulist_2 p {
+	margin-left: 15px;
+	color: #000;
+	font-size: 13px;
+}
+
+#gnb .menulist_3 {
+	line-height: 25px;
+	background-color: #fff;
+	border-bottom : 1px solid #dcdcdc;
+}
+
+#gnb .menulist_3 p {
+	margin-left: 15px;
+	color: #000;
+	font-size: 13px;
+} */
+
+/* ==================== menu ====================*/
+#menu{position:fixed;top:35px;left:75px;height:100%;background:url(../images/gnb_bg_2.png) repeat-y left top;}
+#menu div{position:fixed;top:35px;left:75px;height:100%;background:url(../images/gnb_bg_2.png) repeat-y right top;}
+#menu ul{margin-top:20px;}
+#menu ul li{background:url(../images/bullet_1.png) no-repeat scroll 12px 4px ; color: #fff; font-size: 12px; padding: 0 25px 10px 20px;font-weight:bold;word-spacing:-1px;}
+#menu ul li a{color:#fff;}
+#menu ul li a:hover{color:#00b4ff;}
+
+
+/* ==================== logout ==================== */
+#logout_bg {background-image:url(/images/logout_bg.jpg);background-repeat:repeat-x;background-color:#1d1e20;padding:0;margin:0;"}
+.logout_1 {margin:0 auto;width:621px;height:267px;background-image:url('/images/logoout_img.jpg');padding-top:300px;text-align:center;"}
+.logout_2 {margin:0 auto;font-size:11px;color:#ccc;width:600px;}
+
+
+/* ######### Drop Down DIVs CSS ######### */
+.ddsubmenustyle,.ddsubmenustyle div {
+    /*topmost and sub DIVs, respectively*/
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    list-style-type: none;
+    background: url(../images/gnb_bg_1.png) repeat-y left top;
+    border: 0;
+    visibility: hidden;
+    z-index: 100;
+}
+
+.ddsubmenustyle ul {
+    position: fixed;
+    height: 100%;
+}
+
+.ddsubmenustyle ul li {
+    border: 5px solid #ff0000;
+    margin-top: 100px;
+    margin-left: 100px;
+}
+
+.ddsubmenustyle li a {
+    display: block;
+    width: 135px; /*width of menu (not including side paddings)*/
+    color: white;
+    text-decoration: none;
+}
+
+.ddsubmenustyle li a:hover {
+    border: 1px solid #ff0000;
+}
+
+/* ######### Marker List Vertical Menu ######### */
+.markermenu {
+    width:; /*width of side bar menu*/
+    clear:;
+    position:;
+    /*Preserve this for "right" arrow images (added by script) to be positioned correctly*/
+}
+
+.markermenu ul {
+    list-style-type:;
+    margin:;
+    padding:;
+    border:;
+}
+
+.markermenu ul li a {
+    display: block;
+    height: 75px;
+}
+
+
+
+/* ######### Customized Drop Down ULs CSS (inherits from ddlevelsmenu-base.css) ######### */
+.blackwhite li a {
+    background: white;
+}
+
+.blackwhite li a:hover {
+    background: black;
+    color: white;
+}
+
+
+#wrap {width:100% ;margin:0px ;padding: 0;}
+
+
+div .k-content{
+    border:0  !important;
+}
+
+.tabHeader{
+    background: red;
+    color:white;
+    text-align: left;
+    font-weight: bold;
+    vertical-align: bottom;
+    width: 150px;
+}
+
+.staticNoti {
+	position: absolute;
+	z-index:9999999999;
+	width:300px;
+    left: 500px;
+    background-color:transparent;
+	top: 0;
+	height: 100%;
+	overflow: auto;
+	float: right;
+}
+

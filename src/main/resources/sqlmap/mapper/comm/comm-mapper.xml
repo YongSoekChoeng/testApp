@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Comm">
+	<!-- 원본은 Oracle ROWNUM 3중 서브쿼리 페이징이었다. MySQL 8은 윈도우 함수(COUNT(*) OVER())와
+	     LIMIT ... OFFSET을 직접 지원하므로 그걸로 단순화했다(원본의 ROW_NUMBER 컬럼은 화면에서
+	     참조하는 곳이 없어 뺐다). -->
+	<sql id="PagingStart">
+		SELECT AA.*
+		  FROM (SELECT COUNT(*) OVER() AS total
+					 , A.*
+			      FROM (
+	</sql>
+
+	<sql id="PagingEnd">
+			           ) A
+				<if test="@kr.co.gnx.comm.util.CommUtil@isNotEmpty(sort_column)">
+					 ORDER BY ${sort_column}
+				</if>
+			   ) AA
+		 LIMIT ${pageSize} OFFSET ${(page-1)*pageSize}
+	</sql>
+	
+	<sql id="CountStart">
+		SELECT COUNT(1) AS TOTAL
+		  FROM (
+	</sql>
+	
+	<sql id="CountEnd">
+			   ) A
+	</sql>
+	
+	<sql id="PagingLimitStart">
+		SELECT ${total} AS TOTAL
+			 , A.*
+		  FROM (
+	</sql>
+	
+	<sql id="PagingLimitEnd">
+			   ) A
+		<if test="@kr.co.gnx.comm.util.CommUtil@isNotEmpty(sort_column)">
+		ORDER BY ${sort_column}
+		</if>
+		LIMIT ${pageoffset}, ${pageSize}
+	</sql>
+	
+	<sql id="RoleExcepcion">
+		'SADMIN','ADMIN','INSCOM','INSCOMNVL', 'RPA'
+	</sql>
+	
+	<sql id="MemberExcepcion">
+		'GNX', 'PRD'
+	</sql>
+		
+	<sql id="SuperMemberExcepcion">
+		'GNX'
+	</sql>
+	
+	<sql id="AuthExcepcion">
+		'ROLE_0'
+	</sql>
+	
+	<!-- 조회권한(사원) -->
+	
+	<sql id="ErpRolesHierarchyTree">
+		WITH recursive hierarchy_cte
+		  AS (SELECT 1 AS level
+                   , CAST(tb2.chld_role_id AS CHAR(4000)) AS ordersb
+		           , CAST(tb2.chld_role_id AS CHAR(4000)) AS role_path
+				   , tb2.mb_id           /* 회사코드   VARCHAR(20) */
+				   , tb2.prnt_role_id    /* 부모롤ID   VARCHAR(50) */
+				   , tb2.chld_role_id    /* 자식롤ID   VARCHAR(50) */
+				   , tb2.in_emp_cd       /* 입력자사번 VARCHAR(20) */
+				   , tb2.in_dtm          /* 입력일시   DATETIME    */
+				   , tb2.up_emp_cd       /* 수정자사번 VARCHAR(20) */
+				   , tb2.up_dtm          /* 수정일시   DATETIME    */
+		        FROM (SELECT tb1.* FROM tbsy_roles_hierarchy tb1
+		               WHERE mb_id = #{mb_id}
+		                 AND chld_role_id = #{role_id}
+		             ) tb2
+		       UNION ALL
+		      SELECT level+1 AS level
+                   , CONCAT(hierarchy_cte.ordersb,tb4.chld_role_id) AS ordersb
+		           , CONCAT(role_path,'>',tb4.chld_role_id) as role_path
+				   , tb4.mb_id           /* 회사코드   VARCHAR(20) */
+				   , tb4.prnt_role_id    /* 부모롤ID   VARCHAR(50) */
+				   , tb4.chld_role_id    /* 자식롤ID   VARCHAR(50) */
+				   , tb4.in_emp_cd       /* 입력자사번 VARCHAR(20) */
+				   , tb4.in_dtm          /* 입력일시   DATETIME    */
+				   , tb4.up_emp_cd       /* 수정자사번 VARCHAR(20) */
+				   , tb4.up_dtm          /* 수정일시   DATETIME    */
+		        FROM (SELECT * 
+						FROM tbsy_roles_hierarchy
+		               WHERE mb_id = #{mb_id}
+		             ) tb4
+		      	JOIN hierarchy_cte
+				  ON tb4.chld_role_id = hierarchy_cte.prnt_role_id
+			)
+	</sql>
+	
+	
+	<select id="selectAuthNumCheck" parameterType="kr.co.gnx.system.login.LoginVO" resultType="bmap">
+		/* comm-mapper.xml selectAuthNumCheck SMS 인증번호 조회  */
+		SELECT mb_id       /* 회사코드    VARCHAR2(20) */
+		     , emp_cd      /* 사원코드    VARCHAR2(20) */
+		     , auth_num    /* SMS인증번호 VARCHAR2(40) */
+		     , in_dtm      /* 전송일시    TIMESTAMP    */
+		  FROM tbsy_login_auth_num /* [SY][시스템] 로그인 SMS인증번호관리 */
+		 WHERE mb_id = #{mb_id}
+		   AND emp_cd = #{emp_cd}
+	</select>
+	
+	<insert id="insertAuthNum" parameterType="kr.co.gnx.system.login.LoginVO">
+		/* comm-mapper.xml insertAuthNum SMS 인증번호 저장  */
+		INSERT
+		  INTO tbsy_login_auth_num /* [SY][시스템] 로그인 SMS인증번호관리 */
+		     ( mb_id       /* 회사코드    VARCHAR2(20) */
+		     , emp_cd      /* 사원코드    VARCHAR2(20) */
+		     , auth_num    /* SMS인증번호 VARCHAR2(40) */
+		     , in_dtm      /* 전송일시    TIMESTAMP    */
+		     )
+		VALUES
+		     ( #{mb_id}      /* 회사코드    VARCHAR2(20) */
+		     , #{emp_cd}     /* 사원코드    VARCHAR2(20) */
+		     , #{auth_num}   /* SMS인증번호 VARCHAR2(40) */
+		     , now()       /* 전송일시    TIMESTAMP    */
+		     )
+	</insert>
+	
+	<delete id="deleteAuthNum" parameterType="kr.co.gnx.system.login.LoginVO">
+		/* comm-mapper.xml deleteAuthNum SMS 인증번호 삭제  */
+		DELETE FROM tbsy_login_auth_num /* [SY][시스템] 로그인 SMS인증번호관리 */
+		 WHERE mb_id = #{mb_id}
+		   AND emp_cd = #{emp_cd}
+	</delete>
+	
+	<sql id="orderBySortColumn">
+		<if test="@kr.co.gnx.comm.util.CommUtil@isNotEmpty(sort_column)">
+		ORDER BY ${sort_column}
+		</if>
+	</sql>
+	
+	<sql id="allJigubCalcTypeGrpCmmCd">
+		'FC_JIGUB_TYPE_CD', 'OVR_TYPE_CD', 'CAR_JIGUB_TYPE_CD', 'GEN_JIGUB_TYPE_CD', 'REC_JIGUB_TYPE_CD', 'PAYROLL_TYPE_CD', 'JIGUB_STAT_CD'
+	</sql>
+	
+	<sql id="jigubTypeGrpCmmCd">
+		'FC_JIGUB_TYPE_CD', 'OVR_TYPE_CD', 'CAR_JIGUB_TYPE_CD', 'GEN_JIGUB_TYPE_CD', 'REC_JIGUB_TYPE_CD', 'CM_JIGUB_TYPE_CD'
+	</sql>
+</mapper>

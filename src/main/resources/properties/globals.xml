@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd" >
+<properties>
+	<comment>
+		로컬 테스트용 설정 (SDLC 워크플로우 데모용 testApp).
+		실제 운영/개발 서버 접속정보가 아니다 - 로컬 MySQL 하나만 바라본다.
+		원래 원본 소스에는 Jasypt로 암호화된 실제 운영 Oracle/MariaDB 접속정보가 들어있었으나,
+		이 테스트 프로젝트에서는 완전히 제거하고 로컬 MySQL 평문 설정으로 교체했다.
+
+		DriverClassName/Url/UserName/Password는 Spring의 property-placeholder(${Globals.X})가 그대로 읽고,
+		LogerYN/httpdomain/ANYBIZ_ErpUrl은 propertiesVO.java가 Globals.DBGubun 값을 접두어로 붙여 직접
+		globals.xml을 다시 읽는다(원본의 dev/real 접두어 방식과 동일한 구조, 접두어만 "local"로 바꿨다).
+	</comment>
+	<entry key="Globals.DriverClassName">com.mysql.cj.jdbc.Driver</entry>
+	<entry key="Globals.Url">jdbc:mysql://127.0.0.1:3306/testApp?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=Asia/Seoul&amp;characterEncoding=UTF-8</entry>
+	<entry key="Globals.UserName">testapp</entry>
+	<entry key="Globals.Password">Testapp1234!</entry>
+	<entry key="Globals.apiConnectUrl">LOCAL</entry>
+
+	<entry key="Globals.DBGubun">local</entry>
+	<entry key="local.Globals.LogerYN">Y</entry>
+	<entry key="local.Globals.httpdomain">http://localhost:7080/</entry>
+	<entry key="local.Globals.ANYBIZ_ErpUrl">http://localhost:7080/</entry>
+</properties>

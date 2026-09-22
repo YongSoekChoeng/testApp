@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	원본은 CMS(Oracle) 로그인 경로(SelectUserView/SelectRolesHierarchyList/SelectRoleCheck)와
+	ERP(MariaDB) 로그인 경로(selectErpUserView/selectErpRolesHierarchyList)를 둘 다 갖고 있었지만,
+	CommService.getLoginAuthCheck()는 이미 ERP 경로만 호출하고 있었다(Oracle 경로 호출은 주석 처리돼 있었음).
+	이 테스트 프로젝트는 로컬 MySQL 하나뿐이므로 원래도 안 쓰이던 Oracle 전용 SQL은 제거하고 ERP 경로만 남긴다.
+-->
+<mapper namespace="SpringSecurity">
+
+	<select id="selectErpUserView" parameterType="hmap" resultType="kr.co.gnx.security.model.User">
+		/* springsecurity-mapper.xml selectErpUserView 설계사 정보 조회 */
+		SELECT TB1.mb_id
+	         , TB1.mb_nm
+	         , TB1.mb_login_id
+	         , TB2.login_id AS user_id
+	         , TB2.emp_cd
+	         , TB4.emp_nm
+	         , TB2.user_pwd AS password
+	         , TB3.role_id
+	         , CASE WHEN concurrent_idx = 1 THEN TB4.jikgub
+	                   ELSE TB3.jikgub
+	               END AS jikgub
+	         , CASE WHEN concurrent_idx = 1 THEN TB4.jikchk
+	                   ELSE TB3.jikchk
+	               END AS jikchk
+	         , CASE WHEN concurrent_idx = 1 THEN TB4.scd
+	                   ELSE TB3.scd
+	               END AS scd
+	         , CASE WHEN concurrent_idx = 1 THEN TB5.snm
+	                   ELSE TB6.snm
+	               END AS snm
+	         , TB4.hpno
+	         , TB4.telno
+	         , TB4.extno
+	         , TB4.email
+	         , TB4.empsta
+	         , TB4.pay_gbn
+	         , TB2.pwd_intzn_type
+	         , TB2.acct_lock_type
+	         , TB1.pkg_name
+	         , TB3.concurrent_idx
+	         , TB2.login_autr_type
+	         , DATE_FORMAT(NOW(), '%Y-%m-%d %T') AS login_time
+	         , TB1.logo_url
+	         , TB1.copy_right
+	         , IFNULL(TB1.session_time, 30) AS session_time
+	         , 'CMS4' AS project_type
+	      FROM tbsy_member TB1
+	INNER JOIN tbsy_login TB2
+	        ON TB1.mb_id = TB2.mb_id
+	       AND TB2.login_id = #{login_id}
+	INNER JOIN tbsy_user_role_map TB3
+	        ON TB1.mb_id = TB3.mb_id
+	       AND TB2.emp_cd = TB3.emp_cd
+	       AND TB3.concurrent_idx = #{concurrent_idx}
+	INNER JOIN tbin_empmst TB4
+	        ON TB1.mb_id = TB4.mb_id
+	       AND TB2.emp_cd = TB4.emp_cd
+	INNER JOIN tbin_scd TB5
+	        ON TB1.mb_id = TB5.mb_id
+	       AND TB4.scd = TB5.scd
+	 LEFT JOIN tbin_scd TB6
+	        ON TB1.mb_id = TB6.mb_id
+	       AND TB3.scd = TB6.scd
+		 WHERE TB1.mb_login_id = UPPER(#{mb_id})
+		   AND TB1.mb_login_id IN (<include refid="Comm.MemberExcepcion" />)
+	</select>
+
+	<select id="selectErpRolesHierarchyList" parameterType="hmap" resultType="kr.co.gnx.security.model.Role">
+		/* springsecurity-mapper.xml selectErpRolesHierarchyList ERP 권한 하위계층조회 */
+		<include refid="Comm.ErpRolesHierarchyTree"/>
+		SELECT chld_role_id as name
+		  FROM hierarchy_cte
+	</select>
+</mapper>

@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Member">
+	<sql id="selectMemberSql">
+		SELECT tb1.seq             /* 접근유형           BIGINT        */
+		     , tb1.mb_id           /* 회원사ID     VARCHAR(20)   */
+		     , tb1.mb_nm           /* 회사명             VARCHAR(100)  */
+		     , tb1.mb_login_id     /* 회원사로그인ID VARCHAR(20)   */
+		     , tb1.zipcd           /* 우편번호          VARCHAR(7)    */
+		     , tb1.addr1           /* 주소               VARCHAR(100)  */
+		     , tb1.addr2           /* 상세주소          VARCHAR(100)  */
+		     , tb1.mb_type         /* 회사타입          VARCHAR(4)    */
+		     , tb1.use_yn          /* 사용여부          VARCHAR(1)    */
+		     , tb1.cont_frymd      /* 계약시작일        VARCHAR(10)   */
+		     , tb1.cont_toymd      /* 계약종료일        VARCHAR(10)   */
+		     , tb1.corp_reg_num    /* 법인등록번호      VARCHAR(12)   */
+		     , tb1.tax_reg_num	   /* 사업자등록번호   VARCHAR(20)   */
+		     , tb1.corp_email	   /* 회사대표이메일   VARCHAR(100)   */
+		     , tb1.represent_nm    /* 대표명             VARCHAR(30)   */
+		     , tb1.telno           /* 전화번호           VARCHAR(14)   */
+		     , tb1.faxno           /* 팩스번호           VARCHAR(14)   */
+		     , tb1.domain_url      /* 도메인URL     VARCHAR(100)  */
+		     , tb1.domain_mng      /* 도메인관리         VARCHAR(100)  */
+		     , tb1.domain_id       /* 도메인ID      VARCHAR(100)  */
+		     , tb1.domain_pw       /* 도메인비번         VARCHAR(100)  */
+		     , tb1.ci_url          /* CI URL      VARCHAR(200)  */
+		     , tb1.logo_url        /* 로고 URL      VARCHAR(200)  */
+		     , tb1.manager_nm      /* 관리자명           VARCHAR(30)   */
+		     , tb1.mtelno          /* 관리자연락처       VARCHAR(14)   */
+		     , tb1.pkg_name        /* PKG명              VARCHAR(20)   */
+		     , tb1.copy_right      /* COPYRIGHT          VARCHAR(2000) */
+		     , tb1.certlogo_url    /* 증명서사용로고 URL VARCHAR(200)  */
+		     , tb1.seal_url        /* 직인 URL           VARCHAR(200)  */
+		     , tb1.certificate_mb_nm	/* 증명서 출력용 회사명  VARCHAR(100) */
+		     , tb1.session_time		/* 세션시간(분) int(11) */
+		     , tb1.sort_no         /* 정렬순서           INT           */
+		     , tb1.memo            /* 메모               VARCHAR(200)  */
+		     , tb1.bigo            /* 비고               VARCHAR(100)  */
+		     , tb1.in_emp_cd       /* 입력자사번         VARCHAR(20)   */
+		     , DATE_FORMAT(tb1.in_dtm, '%Y-%m-%d %H:%i:%s') AS in_dtm	/* 입력일시           DATETIME     */
+		     , tb1.up_emp_cd       /* 수정자사번         VARCHAR(20)   */
+		     , DATE_FORMAT(tb1.up_dtm, '%Y-%m-%d %H:%i:%s') AS up_dtm	/* 수정일시           DATETIME     */
+		     , tb2.file_no AS ci_no
+		     , tb2.file_nm AS ci_file_nm
+		     , tb2.file_size AS ci_file_size
+		     , tb3.file_no AS logo_no
+		     , tb3.file_nm AS logo_file_nm
+		     , tb3.file_size AS logo_file_size
+		     , tb4.file_no AS certlogo_no
+		     , tb4.file_nm AS certlogo_file_nm
+		     , tb4.file_size AS certlogo_file_size
+		     , tb5.file_no AS seal_no
+		     , tb5.file_nm AS seal_file_nm
+		     , tb5.file_size AS seal_file_size
+		     , tb14.cd_vl_nm AS use_yn_nm
+		  FROM tbsy_member tb1 /* [SY][시스템] 회원사관리 */
+		  LEFT OUTER JOIN tbsy_file_info tb2
+		    ON tb1.mb_id = tb2.mb_id
+		   AND tb1.ci_url = tb2.file_url
+		  LEFT OUTER JOIN tbsy_file_info tb3
+		    ON tb1.mb_id = tb3.mb_id
+		   AND tb1.logo_url = tb3.file_url
+		  LEFT OUTER JOIN tbsy_file_info tb4
+		    ON tb1.mb_id = tb4.mb_id
+		   AND tb1.certlogo_url = tb4.file_url
+		  LEFT OUTER JOIN tbsy_file_info tb5
+		    ON tb1.mb_id = tb5.mb_id
+		   AND tb1.seal_url = tb5.file_url
+ LEFT OUTER JOIN (SELECT * FROM tbcm_common_code WHERE grp_cmm_cd = 'USE_YN') tb14
+ 			  ON tb1.use_yn = tb14.cd_vl
+ 			 AND tb1.mb_id = tb14.mb_id
+
+		 WHERE tb1.mb_id NOT IN (<include refid="Comm.SuperMemberExcepcion"/>)
+		    <if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(use_yn)'>
+				AND tb1.use_yn = #{use_yn}
+			</if>
+			<if test="@kr.co.gnx.comm.util.CommUtil@isNotEmpty(search_word)">
+			    AND (tb1.mb_login_id LIKE CONCAT('%',UPPER(#{search_word}),'%')
+			    	 OR tb1.mb_login_id LIKE CONCAT('%',LOWER(#{search_word}),'%')
+			    	 OR tb1.mb_login_id LIKE CONCAT('%',#{search_word},'%')	<!-- 고객사 이름 -->
+			    	 OR tb1.mb_nm LIKE CONCAT('%',UPPER(#{search_word}),'%')
+			    	 OR tb1.mb_nm LIKE CONCAT('%',LOWER(#{search_word}),'%')
+			    	 OR tb1.mb_nm LIKE CONCAT('%',#{search_word},'%'))  <!-- 고객사 코드  -->
+			</if>
+
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(srch_term_start_value)'>
+				<![CDATA[ AND tb1.cont_frymd >= #{srch_term_start_value} ]]>
+			</if>
+
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(srch_term_start_value)'>
+				<![CDATA[ AND tb1.cont_toymd <= #{srch_term_start_value} ]]>
+			</if>
+
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(srch_term_end_value)'>
+				<![CDATA[ AND tb1.cont_frymd <= #{srch_term_end_value} ]]>
+			</if>
+
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(srch_term_end_value)'>
+				<![CDATA[ AND tb1.cont_toymd >= #{srch_term_end_value} ]]>
+			</if>
+
+	</sql>
+
+
+	<select id="selectMemberListCount" parameterType="kr.co.gnx.system.member.MemberVO" resultType="Integer">
+		<include refid="Comm.CountStart"/>
+		/* member-mapper.xml selectMemberListCount 회원사관리 조회  */
+		<include refid="selectMemberSql"/>
+	  ORDER BY IFNULL(tb1.up_dtm, tb1.in_dtm) DESC
+	  <include refid="Comm.CountEnd"/>
+	</select>
+
+		<select id="selectMemberListPaging" parameterType="kr.co.gnx.system.member.MemberVO" resultType="bmap">
+			/* customer-mapper.xml selectMemberListPaging 회원사관리 목록조회 페이징 */
+			<include refid="Comm.PagingStart"/>
+			<include refid="selectMemberSql"/>
+			ORDER BY IFNULL(tb1.up_dtm, tb1.in_dtm) DESC
+			<include refid="Comm.PagingEnd"/>
+		</select>
+	<!-- 회원사관리 조회 -->
+	<select id="selectMemberList" parameterType="kr.co.gnx.system.member.MemberVO" resultType="bmap">
+		/* member-mapper.xml selectMemberList 회원사관리 조회  */
+		<include refid="selectMemberSql"/>
+	  ORDER BY IFNULL(tb1.up_dtm, tb1.in_dtm) DESC
+	</select>
+
+	<select id="selectMemberUrlView" parameterType="kr.co.gnx.system.member.MemberVO" resultType="bmap">
+		/* member-mapper.xml selectMemberUrlView 회원사관리 URL 상세 조회  */
+		SELECT mb_id
+		     , copy_right
+		  FROM
+		(<include refid="selectMemberSql"/>
+		AND tb1.domain_url LIKE CONCAT('%',#{domain_url},'%')) tb6
+	</select>
+
+	<select id="selectMemberCount" parameterType="kr.co.gnx.system.member.MemberVO" resultType="java.lang.Integer">
+		/* member-mapper.xml selectMemberCount 보험사 중복조회 */
+		SELECT COUNT(mb_id)
+		  FROM tbsy_member
+		 WHERE mb_id = #{mb_id}
+	</select>
+
+	<!-- 회원사관리 등록 -->
+	<insert id="insertMember" parameterType="kr.co.gnx.system.member.MemberVO">
+		/* member-mapper.xml insertMember 회원사관리 등록  */
+		INSERT
+		  INTO tbsy_member /* [SY][시스템] 회원사관리 */
+		     ( mb_id           /* 회원사ID           VARCHAR(20)   */
+		     , mb_nm           /* 회사명             VARCHAR(100)  */
+		     , mb_login_id     /* 회원사로그인ID     VARCHAR(20)   */
+		     , copy_mb_id      /* 복사한 회원사ID           VARCHAR(20)   */
+		     , zipcd           /* 우편번호           VARCHAR(7)    */
+		     , addr1           /* 주소               VARCHAR(100)  */
+		     , addr2           /* 상세주소           VARCHAR(100)  */
+		     , mb_type         /* 회사타입           VARCHAR(4)    */
+		     , use_yn          /* 사용여부           VARCHAR(1)    */
+		     , cont_frymd      /* 계약시작일         VARCHAR(10)   */
+		     , cont_toymd      /* 계약종료일         VARCHAR(10)   */
+		     , corp_reg_num    /* 법인등록번호       VARCHAR(12)   */
+		     , tax_reg_num	   /* 사업자등록번호 VARCHAR(20) */
+		     , corp_email	   /* 회사이메일 VARCHAR(100) */
+		     , represent_nm    /* 대표명             VARCHAR(30)   */
+		     , telno           /* 전화번호           VARCHAR(14)   */
+		     , faxno           /* 팩스번호           VARCHAR(14)   */
+		     , domain_url      /* 도메인URL          VARCHAR(100)  */
+		     , domain_mng      /* 도메인관리         VARCHAR(100)  */
+		     , domain_id       /* 도메인ID           VARCHAR(100)  */
+		     , domain_pw       /* 도메인비번         VARCHAR(100)  */
+		     , ci_url          /* CI URL             VARCHAR(200)  */
+		     , logo_url        /* 로고 URL           VARCHAR(200)  */
+		     , manager_nm      /* 관리자명           VARCHAR(30)   */
+		     , mtelno          /* 관리자연락처       VARCHAR(14)   */
+		     , pkg_name        /* PKG명              VARCHAR(20)   */
+		     , copy_right      /* COPYRIGHT          VARCHAR(2000) */
+		     , certlogo_url    /* 증명서사용로고 URL VARCHAR(200)  */
+		     , seal_url        /* 직인 URL           VARCHAR(200)  */
+		     , certificate_mb_nm	/* 증명서 출력용 회사명  VARCHAR(100) */
+		     , session_time	   /* 세션시간(분) int(11) */
+		     , sort_no         /* 정렬순서           INT           */
+		     , memo            /* 메모               VARCHAR(200)  */
+		     , bigo            /* 비고               VARCHAR(100)  */
+		     , secret_key	   /* 암호화키 	   VARCHAR(32)*/
+		     , iv			   /* 대칭키    	   VARCHAR(16)*/
+		     , in_emp_cd       /* 입력자사번         VARCHAR(20)   */
+		     , in_dtm          /* 입력일시           DATETIME     */
+		     , up_emp_cd       /* 수정자사번         VARCHAR(20)   */
+		     , up_dtm          /* 수정일시           DATETIME     */
+		     )
+		VALUES
+		     ( UPPER(#{mb_id})          /* 회원사ID           VARCHAR(20)   */
+		     , #{mb_nm}          /* 회사명             VARCHAR(100)  */
+		     , UPPER(#{mb_login_id})    /* 회원사로그인ID     VARCHAR(20)   */
+		     , UPPER(#{copy_mb_id})     /* 복사한 회원사ID           VARCHAR(20)   */
+		     , #{zipcd}          /* 우편번호           VARCHAR(7)    */
+		     , #{addr1}          /* 주소               VARCHAR(100)  */
+		     , #{addr2}          /* 상세주소           VARCHAR(100)  */
+		     , #{mb_type}        /* 회사타입           VARCHAR(4)    */
+		     , #{use_yn}               /* 사용여부           VARCHAR(1)    */
+		     , #{cont_frymd}     /* 계약시작일         VARCHAR(10)   */
+		     , #{cont_toymd}     /* 계약종료일         VARCHAR(10)   */
+		     , #{corp_reg_num}   /* 법인등록번호       VARCHAR(12)   */
+		     , #{tax_reg_num}	 /* 사업자등록번호 VARCHAR(20) */
+		     , #{corp_email}	 /* 회사이메일 VARCHAR(100) */
+		     , #{represent_nm}   /* 대표명             VARCHAR(30)   */
+		     , #{telno}          /* 전화번호           VARCHAR(14)   */
+		     , #{faxno}          /* 팩스번호           VARCHAR(14)   */
+		     , #{domain_url}     /* 도메인URL          VARCHAR(100)  */
+		     , #{domain_mng}     /* 도메인관리         VARCHAR(100)  */
+		     , #{domain_id}      /* 도메인ID           VARCHAR(100)  */
+		     , #{domain_pw}      /* 도메인비번         VARCHAR(100)  */
+		     , #{ci_url}         /* CI URL             VARCHAR(200)  */
+		     , #{logo_url}       /* 로고 URL           VARCHAR(200)  */
+		     , #{manager_nm}     /* 관리자명           VARCHAR(30)   */
+		     , #{mtelno}         /* 관리자연락처       VARCHAR(14)   */
+		     , 'PKG_SU_CALC'     /* PKG명              VARCHAR(20)   */
+		     , #{copy_right}     /* COPYRIGHT          VARCHAR(2000) */
+		     , #{certlogo_url}   /* 증명서사용로고 URL VARCHAR(200)  */
+		     , #{seal_url}       /* 직인 URL           VARCHAR(200)  */
+		     , #{certificate_mb_nm}	/* 증명서 출력용 회사명  VARCHAR(100) */
+		     , IFNULL(#{session_time}, 30)		/* 세션시간(분) int(11) */
+		     , #{sort_no}        /* 정렬순서           INT           */
+		     , #{memo}           /* 메모               VARCHAR(200)  */
+		     , #{bigo}           /* 비고               VARCHAR(100)  */
+		     , SUBSTRING(MD5(RAND()), 1, 32)   /* 원본은 Oracle 함수 create_random_key(32) - MySQL은 난수 MD5로 대체 */
+		     , SUBSTRING(MD5(RAND()), 1, 16)   /* 원본은 Oracle 함수 create_random_key(16) - MySQL은 난수 MD5로 대체 */
+		     , #{in_emp_cd}      /* 입력자사번         VARCHAR(20)   */
+		     , NOW()             /* 입력일시           DATETIME     */
+		     , null              /* 수정자사번         VARCHAR(20)   */
+		     , null              /* 수정일시           DATETIME     */
+		     )
+	</insert>
+
+	<!-- 회원사관리 수정 -->
+	<update id="updateMember" parameterType="kr.co.gnx.system.member.MemberVO">
+		/* member-mapper.xml updateMember 회원사관리 수정  */
+		UPDATE tbsy_member /* [SY][시스템] 회원사관리 */
+		   SET mb_nm        = #{mb_nm}           /* 회사명             VARCHAR(100)  */
+		     , mb_login_id  = UPPER(#{mb_login_id})     /* 회원사로그인ID     VARCHAR(20)   */
+		     , zipcd        = #{zipcd}           /* 우편번호           VARCHAR(7)    */
+		     , addr1        = #{addr1}           /* 주소               VARCHAR(100)  */
+		     , addr2        = #{addr2}           /* 상세주소           VARCHAR(100)  */
+		     , mb_type      = #{mb_type}         /* 회사타입           VARCHAR(4)    */
+		     , cont_frymd   = #{cont_frymd}      /* 계약시작일         VARCHAR(10)   */
+		     , cont_toymd   = #{cont_toymd}      /* 계약종료일         VARCHAR(10)   */
+		     , corp_reg_num = #{corp_reg_num}    /* 법인등록번호       VARCHAR(12)   */
+		     , tax_reg_num  = #{tax_reg_num}	 /* 사업자등록번호       VARCHAR(20)   */
+		     , corp_email   = #{corp_email}		 /* 회사이메일       VARCHAR(100)   */
+		     , represent_nm = #{represent_nm}    /* 대표명             VARCHAR(30)   */
+		     , telno        = #{telno}           /* 전화번호           VARCHAR(14)   */
+		     , faxno        = #{faxno}           /* 팩스번호           VARCHAR(14)   */
+		     , domain_url   = #{domain_url}      /* 도메인URL          VARCHAR(100)  */
+		     , domain_mng   = #{domain_mng}      /* 도메인관리         VARCHAR(100)  */
+		     , domain_id    = #{domain_id}       /* 도메인ID           VARCHAR(100)  */
+		     , domain_pw    = #{domain_pw}       /* 도메인비번         VARCHAR(100)  */
+		     , ci_url       = #{ci_url}          /* CI URL             VARCHAR(200)  */
+		     , logo_url     = #{logo_url}        /* 로고 URL           VARCHAR(200)  */
+		     , manager_nm   = #{manager_nm}      /* 관리자명           VARCHAR(30)   */
+		     , mtelno       = #{mtelno}          /* 관리자연락처       VARCHAR(14)   */
+		     , copy_right   = #{copy_right}      /* COPYRIGHT          VARCHAR(2000) */
+		     , certlogo_url = #{certlogo_url}    /* 증명서사용로고 URL VARCHAR(200)  */
+		     , seal_url     = #{seal_url}        /* 직인 URL           VARCHAR(200)  */
+		     , certificate_mb_nm = #{certificate_mb_nm}			/* 증명서 출력용 회사명  VARCHAR(100) */
+		     , session_time	= IFNULL(#{session_time}, 30)	/* 세션시간(분) int(11) */
+		     , sort_no      = #{sort_no}         /* 정렬순서           INT           */
+		     , memo         = #{memo}            /* 메모               VARCHAR(200)  */
+		     , bigo         = #{bigo}            /* 비고               VARCHAR(100)  */
+		     , up_emp_cd    = #{up_emp_cd}       /* 수정자사번         VARCHAR(20)   */
+		     , up_dtm       = NOW()              /* 수정일시           DATETIME     */
+		     , use_yn       = #{use_yn}               /* 사용여부           VARCHAR(1)    */
+		 WHERE mb_id = #{mb_id}
+	</update>
+
+	<!-- 회원사관리 삭제 -->
+	<delete id="deleteMember" parameterType="kr.co.gnx.system.member.MemberVO">
+		/* member-mapper.xml deleteMember 회원사관리 삭제  */
+		DELETE FROM tbsy_member /* [SY][시스템] 회원사관리 */
+		 WHERE mb_id = #{mb_id}
+	</delete>
+
+	<select id="selectMemberView" parameterType="kr.co.gnx.system.member.MemberVO" resultType="bmap">
+		/* member-mapper.xml selectMemberView 회원사관리 단건 조회  */
+		SELECT tb1.seq             /* 접근유형           BIGINT        */
+		     , tb1.mb_id           /* 회원사ID           VARCHAR(20)   */
+		     , tb1.mb_nm           /* 회사명             VARCHAR(100)  */
+		     , tb1.mb_login_id     /* 회원사로그인ID     VARCHAR(20)   */
+		     , tb1.zipcd           /* 우편번호           VARCHAR(7)    */
+		     , tb1.addr1           /* 주소               VARCHAR(100)  */
+		     , tb1.addr2           /* 상세주소           VARCHAR(100)  */
+		     , tb1.mb_type         /* 회사타입           VARCHAR(4)    */
+		     , tb1.use_yn          /* 사용여부           VARCHAR(1)    */
+		     , tb1.cont_frymd      /* 계약시작일         VARCHAR(10)   */
+		     , tb1.cont_toymd      /* 계약종료일         VARCHAR(10)   */
+		     , tb1.corp_reg_num    /* 법인등록번호       VARCHAR(12)   */
+		     , tb1.tax_reg_num	   /* 사업자등록번호       VARCHAR(20)   */
+		     , tb1.represent_nm    /* 대표명             VARCHAR(30)   */
+		     , tb1.telno           /* 전화번호           VARCHAR(14)   */
+		     , tb1.faxno           /* 팩스번호           VARCHAR(14)   */
+		     , tb1.domain_url      /* 도메인URL          VARCHAR(100)  */
+		     , tb1.domain_mng      /* 도메인관리         VARCHAR(100)  */
+		     , tb1.domain_id       /* 도메인ID           VARCHAR(100)  */
+		     , tb1.domain_pw       /* 도메인비번         VARCHAR(100)  */
+		     , tb1.ci_url          /* CI URL             VARCHAR(200)  */
+		     , tb1.logo_url        /* 로고 URL           VARCHAR(200)  */
+		     , tb1.manager_nm      /* 관리자명           VARCHAR(30)   */
+		     , tb1.mtelno          /* 관리자연락처       VARCHAR(14)   */
+		     , tb1.pkg_name        /* PKG명              VARCHAR(20)   */
+		     , tb1.copy_right      /* COPYRIGHT          VARCHAR(2000) */
+		     , tb1.certlogo_url    /* 증명서사용로고 URL VARCHAR(200)  */
+		     , tb1.seal_url        /* 직인 URL           VARCHAR(200)  */
+		     , tb1.certificate_mb_nm	/* 증명서 출력용 회사명  VARCHAR(100) */
+		     , tb1.session_time		/* 세션시간(분) int(11) */
+		     , tb1.sort_no         /* 정렬순서           INT           */
+		     , tb1.memo            /* 메모               VARCHAR(200)  */
+		     , tb1.bigo            /* 비고               VARCHAR(100)  */
+		     , tb1.secret_key	   /* 암호화 키(32bit) */
+		     , tb1.iv			   /* 대칭키(16bit) */
+		     , tb1.sso_use_yn	   /* SSO 로그인 사용 유무 */
+		     , tb1.erp_sync_url	   /* ERP 정보를 받아올 URL */
+		     , tb1.mb_api_id       /* 회원사 api 로그인 ID       VARCHAR(20)   */
+		     , tb1.mb_api_pwd      /* 회원사 api 로그인 비밀번호 VARCHAR(430)  */
+		     , tb1.in_emp_cd       /* 입력자사번         VARCHAR(20)   */
+		     , tb1.in_dtm          /* 입력일시           DATETIME     */
+		     , tb1.up_emp_cd       /* 수정자사번         VARCHAR(20)   */
+		     , tb1.up_dtm          /* 수정일시           DATETIME     */
+		  FROM tbsy_member tb1 /* [SY][시스템] 회원사관리 */
+		 WHERE mb_id = #{mb_id}
+	</select>
+
+	<select id="selectMemberApiView" parameterType="kr.co.gnx.system.member.MemberVO" resultType="bmap">
+		/* member-mapper.xml selectMemberApiView 회원사관리 단건 조회(API 로그인 전용)  */
+		SELECT tb1.seq             /* 접근유형           BIGINT        */
+		     , tb1.mb_id           /* 회원사ID     VARCHAR(20)   */
+		     , tb1.mb_nm           /* 회사명             VARCHAR(100)  */
+		     , tb1.mb_login_id     /* 회원사로그인ID     VARCHAR(20)   */
+		     , tb1.zipcd           /* 우편번호           VARCHAR(7)    */
+		     , tb1.addr1           /* 주소               VARCHAR(100)  */
+		     , tb1.addr2           /* 상세주소           VARCHAR(100)  */
+		     , tb1.mb_type         /* 회사타입           VARCHAR(4)    */
+		     , tb1.use_yn          /* 사용여부           VARCHAR(1)    */
+		     , tb1.cont_frymd      /* 계약시작일         VARCHAR(10)   */
+		     , tb1.cont_toymd      /* 계약종료일         VARCHAR(10)   */
+		     , tb1.corp_reg_num    /* 법인등록번호       VARCHAR(12)   */
+		     , tb1.tax_reg_num	   /* 사업자등록번호       VARCHAR(20)   */
+		     , tb1.represent_nm    /* 대표명             VARCHAR(30)   */
+		     , tb1.telno           /* 전화번호           VARCHAR(14)   */
+		     , tb1.faxno           /* 팩스번호           VARCHAR(14)   */
+		     , tb1.domain_url      /* 도메인URL          VARCHAR(100)  */
+		     , tb1.domain_mng      /* 도메인관리         VARCHAR(100)  */
+		     , tb1.domain_id       /* 도메인ID           VARCHAR(100)  */
+		     , tb1.domain_pw       /* 도메인비번         VARCHAR(100)  */
+		     , tb1.ci_url          /* CI URL             VARCHAR(200)  */
+		     , tb1.logo_url        /* 로고 URL           VARCHAR(200)  */
+		     , tb1.manager_nm      /* 관리자명           VARCHAR(30)   */
+		     , tb1.mtelno          /* 관리자연락처       VARCHAR(14)   */
+		     , tb1.pkg_name        /* PKG명              VARCHAR(20)   */
+		     , tb1.copy_right      /* COPYRIGHT          VARCHAR(2000) */
+		     , tb1.certlogo_url    /* 증명서사용로고 URL VARCHAR(200)  */
+		     , tb1.seal_url        /* 직인 URL           VARCHAR(200)  */
+		     , tb1.certificate_mb_nm	/* 증명서 출력용 회사명  VARCHAR(100) */
+		     , tb1.session_time		/* 세션시간(분) int(11) */
+		     , tb1.sort_no         /* 정렬순서           INT           */
+		     , tb1.memo            /* 메모               VARCHAR(200)  */
+		     , tb1.bigo            /* 비고               VARCHAR(100)  */
+		     , tb1.secret_key	   /* 암호화 키(32bit) */
+		     , tb1.iv			   /* 대칭키(16bit) */
+		     , tb1.sso_use_yn	   /* SSO 로그인 사용 유무 */
+		     , tb1.erp_sync_url	   /* ERP 정보를 받아올 URL */
+		     , tb1.mb_api_id       /* 회원사 api 로그인 ID       VARCHAR(20)   */
+		     , tb1.mb_api_pwd      /* 회원사 api 로그인 비밀번호 VARCHAR(430)  */
+		     , tb1.in_emp_cd       /* 입력자사번         VARCHAR(20)   */
+		     , tb1.in_dtm          /* 입력일시           DATETIME     */
+		     , tb1.up_emp_cd       /* 수정자사번         VARCHAR(20)   */
+		     , tb1.up_dtm          /* 수정일시           DATETIME     */
+		  FROM tbsy_member tb1 /* [SY][시스템] 회원사관리 */
+		 WHERE mb_id = #{mb_id}
+		   AND mb_api_id = #{mb_api_id}
+		   AND mb_api_pwd = #{mb_api_pwd}
+	</select>
+
+
+	<select id="selectMemberTaxCheck" parameterType="kr.co.gnx.system.member.MemberVO" resultType="java.lang.Integer">
+		/* member-mapper.xml selectMemberTaxCheck 사업자 번호 중복 확인 */
+		SELECT COUNT(mb_id)
+		  FROM tbsy_member
+		 WHERE tax_reg_num = #{tax_reg_num}
+ <![CDATA[ AND mb_id <> #{mb_id} ]]>
+	</select>
+</mapper>

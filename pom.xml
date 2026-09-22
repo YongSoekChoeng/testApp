@@ -1,0 +1,379 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>kr.co.gnx</groupId>
+	<artifactId>cms4_prd</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
+	<name>cms4_prd</name>
+	<url>http://</url>
+	<build>
+	    <finalName>cms4_prd</finalName>
+	    <plugins>
+	        <plugin>
+	            <groupId>org.apache.tomcat.maven</groupId>
+	            <artifactId>tomcat7-maven-plugin</artifactId>
+	            <version>2.2</version>
+	            <configuration>
+	                <port>7080</port>
+	                <path>/</path>
+	            </configuration>
+	        </plugin>
+	    </plugins>
+	</build>
+
+	<properties>
+		<!-- Generic properties -->
+		<java-version>1.8</java-version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+    	<maven.compiler.target>1.8</maven.compiler.target>
+		<!-- Web -->
+		<jsp.version>2.2.1-b03</jsp.version>
+		<jstl.version>1.2</jstl.version>
+		<servlet.version>3.1.0</servlet.version>
+		
+		<!-- Spring -->
+		<spring-framework.version>4.3.7.RELEASE</spring-framework.version>
+		<spring-framework-security.version>4.2.2.RELEASE</spring-framework-security.version>
+		<spring-framework-security-oauth.version>2.3.3.RELEASE</spring-framework-security-oauth.version>
+		<spring-framework-security-oauth2.version>2.0.14.RELEASE</spring-framework-security-oauth2.version>
+		
+		<!-- Mybatis -->
+		<mybatis.version>3.4.2</mybatis.version>
+		<mybatis.spring.version>1.3.1</mybatis.spring.version>
+		
+		<!-- Logging -->
+		<json-lib.version>1.0.2</json-lib.version>
+		
+		<poi.version>4.0.1</poi.version>
+		
+		<aspectjrt.version>1.8.13</aspectjrt.version>
+		<aspectjweaver.version>1.9.1</aspectjweaver.version>
+		<sitemesh.version>3.0.1</sitemesh.version>
+		
+		<commons-lang.version>2.6</commons-lang.version>
+		<commons-fileupload.version>1.3.2</commons-fileupload.version>
+		<commons-dbcp.version>1.4</commons-dbcp.version>
+		<commons-dbcp2.version>2.0.1</commons-dbcp2.version>
+		
+		<jackson.version>2.9.5</jackson.version>
+		<jackson-mapper-asl.version>1.9.13</jackson-mapper-asl.version>
+	</properties>
+		
+	<dependencies>
+		<!-- Spring MVC -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring-framework.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				 </exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring-framework.version}</version>
+		</dependency>
+		        <dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${spring-framework.version}</version>
+		</dependency>
+		<dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-acl</artifactId>
+            <version>${spring-framework-security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>${spring-framework-security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <version>${spring-framework-security.version}</version>
+        </dependency>
+		<dependency>
+		    <groupId>org.springframework.security.oauth</groupId>
+		    <artifactId>spring-security-oauth</artifactId>
+		    <version>${spring-framework-security-oauth.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.springframework.security.oauth</groupId>
+		    <artifactId>spring-security-oauth2</artifactId>
+		    <version>${spring-framework-security-oauth2.version}</version>
+		</dependency>
+				
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-taglibs</artifactId>
+            <version>${spring-framework-security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+            <version>${spring-framework-security.version}</version>
+        </dependency>
+		
+        <!-- Other Web dependencies -->		
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${servlet.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- JDK 11+ 에서는 javax.annotation(@Resource 등)이 기본 JDK에서 빠졌으므로 명시적으로 추가한다 -->
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+			<version>1.3.2</version>
+		</dependency>
+
+		<!-- JDK 11+ 에서는 javax.xml.bind(JAXB, Spring Security StandardPasswordEncoder가 내부적으로 사용하는
+		     DatatypeConverter 포함)도 기본 JDK에서 빠졌으므로 명시적으로 추가한다 -->
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>${jstl.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>${jsp.version}</version>
+			<scope>provided</scope>
+		</dependency>
+	
+		<!-- Spring and Transactions -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${spring-framework.version}</version>
+		</dependency>
+
+		<!-- logback -->
+		<dependency>
+		    <groupId>ch.qos.logback</groupId>
+		    <artifactId>logback-classic</artifactId>
+		    <version>1.2.9</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.logback-extensions</groupId>
+		    <artifactId>logback-ext-spring</artifactId>
+		    <version>0.1.5</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring-framework.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.mybatis</groupId>
+		    <artifactId>mybatis</artifactId>
+		    <version>${mybatis.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.mybatis</groupId>
+		    <artifactId>mybatis-spring</artifactId>
+		    <version>${mybatis.spring.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>commons-lang</groupId>
+		    <artifactId>commons-lang</artifactId>
+		    <version>${commons-lang.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib-ext-spring</artifactId>
+			<version>${json-lib.version}</version>
+			<exclusions>
+		    	<exclusion>
+		    		<groupId>log4j</groupId>
+		    		<artifactId>log4j</artifactId>
+		    	</exclusion>
+		    </exclusions>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi</artifactId>
+		    <version>${poi.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi-ooxml</artifactId>
+		    <version>${poi.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>aopalliance</groupId>
+		    <artifactId>aopalliance</artifactId>
+		    <version>1.0</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.aspectj</groupId>
+		    <artifactId>aspectjrt</artifactId>
+		    <version>${aspectjrt.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.aspectj</groupId>
+		    <artifactId>aspectjweaver</artifactId>
+		    <version>${aspectjweaver.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.sitemesh</groupId>
+		    <artifactId>sitemesh</artifactId>
+		    <version>${sitemesh.version}</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>commons-dbcp</groupId>
+		    <artifactId>commons-dbcp</artifactId>
+		    <version>${commons-dbcp.version}</version>
+		</dependency>
+				
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-dbcp2</artifactId>
+		    <version>${commons-dbcp2.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>commons-fileupload</groupId>
+		    <artifactId>commons-fileupload</artifactId>
+		    <version>${commons-fileupload.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-core</artifactId>
+		    <version>${jackson.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-databind</artifactId>
+		    <version>${jackson.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.codehaus.jackson</groupId>
+		    <artifactId>jackson-mapper-asl</artifactId>
+		    <version>${jackson-mapper-asl.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.webjars.npm</groupId>
+		    <artifactId>typeface-nanum-barun-gothic</artifactId>
+		    <version>1.0.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>javax.activation</groupId>
+		    <artifactId>activation</artifactId>
+		    <version>1.1.1</version>
+		</dependency>
+		<dependency>
+		    <groupId>mysql</groupId>
+		    <artifactId>mysql-connector-java</artifactId>
+		    <version>8.0.33</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.mariadb.jdbc</groupId>
+		    <artifactId>mariadb-java-client</artifactId>
+		    <version>2.2.5</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>io.jsonwebtoken</groupId>
+		    <artifactId>jjwt</artifactId>
+		    <version>0.9.1</version>
+		</dependency>
+
+		<!-- 원본은 springfox-swagger2를 통해 이 애노테이션을 받았으나, swagger UI/API 문서화 모듈 자체는
+		     이 테스트 프로젝트 범위에서 제외했다. VO에 남아있는 @ApiModelProperty만 컴파일되도록
+		     애노테이션 정의만 가벼운 이 의존성으로 대체한다. -->
+		<dependency>
+		    <groupId>io.swagger</groupId>
+		    <artifactId>swagger-annotations</artifactId>
+		    <version>1.5.20</version>
+		</dependency>
+
+		<!-- 원본은 jasypt-spring31(EncryptablePropertyPlaceholderConfigurer)을 썼지만, 이 테스트 프로젝트는
+		     평문 로컬 설정을 쓰므로 그 통합 모듈은 뺐다. 다만 CommUtil의 범용 암복호화 유틸 메서드가
+		     jasypt 코어의 StandardPBEStringEncryptor를 직접 쓰고 있어 코어 라이브러리만 남긴다. -->
+		<dependency>
+		    <groupId>org.jasypt</groupId>
+		    <artifactId>jasypt</artifactId>
+		    <version>1.9.3</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>javax.mail</groupId>
+		    <artifactId>mail</artifactId>
+		    <version>1.4.7</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
+		<dependency>
+		    <groupId>org.apache.pdfbox</groupId>
+		    <artifactId>pdfbox</artifactId>
+		    <version>2.0.17</version>
+		</dependency>
+		<!-- PDFBox-Tool -->
+		<dependency>
+		    <groupId>org.apache.pdfbox</groupId>
+		    <artifactId>pdfbox-tools</artifactId>
+		    <version>2.0.17</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/com.itextpdf/itextpdf -->
+		<dependency>
+		    <groupId>com.itextpdf</groupId>
+		    <artifactId>itextpdf</artifactId>
+		    <version>5.5.13.1</version>
+		</dependency>
+		
+		<!-- image EXIF read -->
+		<dependency>
+			<groupId>com.drewnoakes</groupId>
+			<artifactId>metadata-extractor</artifactId>
+			<version>2.9.1</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/net.javacrumbs.shedlock/shedlock-spring -->
+		<dependency>
+		    <groupId>net.javacrumbs.shedlock</groupId>
+		    <artifactId>shedlock-spring</artifactId>
+		    <version>4.4.0</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/net.javacrumbs.shedlock/shedlock-provider-jdbc-template -->
+		<dependency>
+		    <groupId>net.javacrumbs.shedlock</groupId>
+		    <artifactId>shedlock-provider-jdbc-template</artifactId>
+		    <version>4.4.0</version>
+		</dependency>
+
+	</dependencies>
+</project>

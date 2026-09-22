@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<append>true</append>
+		<param name="threshold" value="debug" />
+		<!-- encoders are assigned the type
+         ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+		<encoder>
+			<pattern>LOGBACK %-5p [%d{yyyy/MM/dd HH:mm:ss.SSS}] %c{1} : %m %n</pattern>
+		</encoder>
+	</appender>
+    
+    <!-- Application Loggers -->
+    <logger name="kr.co.gnx"  additivity="false">
+        <level value="debug" />
+        <appender-ref ref="console" />
+    </logger>
+    <logger name="kr.co.gnx.filter"  additivity="false">
+        <level value="error" />
+        <appender-ref ref="console" />
+    </logger>
+    <logger name="kr.co.gnx.comm"  additivity="false">
+        <level value="error" />
+        <appender-ref ref="console"/>
+    </logger>
+    <logger name="kr.co.gnx.comm.aop.aopAdapter"  additivity="false">
+        <level value="info" />
+        <appender-ref ref="console"/>
+    </logger>
+    <logger name="kr.co.gnx.comm.CommController"  additivity="false">
+        <level value="warn" />
+        <appender-ref ref="console"/>
+    </logger>
+    <logger name="kr.co.gnx.interceptor.InterceptorAdapter"  additivity="false">
+        <level value="info" />
+        <appender-ref ref="console"/>
+    </logger>
+    <logger name="kr.co.gnx.interceptor.QueryInterceptor"  additivity="false">
+        <level value="debug" />
+        <appender-ref ref="console"/>
+    </logger>
+	<logger name="kr.co.gnx.interceptor.UpdateInterceptor"  additivity="false">
+        <level value="debug" />
+        <appender-ref ref="console"/>
+    </logger>
+    <logger name="kr.co.gnx.comm.util.InetUtil"  additivity="false">
+        <level value="info" />
+        <appender-ref ref="console"/>
+    </logger>
+    
+    <logger name="kr.co.gnx.comm.scheduler"  additivity="false">
+        <level value="debug" />
+        <appender-ref ref="console"/>
+    </logger>
+    
+    <logger name="jdbc.sqlonly" additivity="false">
+        <level value="error"/>
+        <appender-ref ref="console"/>
+    </logger>
+    <logger name="java.sql" additivity="false">
+        <level value="error"/>
+        <appender-ref ref="console"/>
+    </logger>
+    <logger name="java.sql.Statement" additivity="false">
+        <level value="error"/>
+        <appender-ref ref="console"/>
+    </logger>
+    <logger name="java.sql.ResultSet" additivity="false">
+        <level value="error"/>
+        <appender-ref ref="console"/>
+    </logger>
+    
+    <logger name="com.ibatis">
+        <level value="error"/>
+        <appender-ref ref="console" />
+    </logger>
+    <logger name="org.mybatis.spring.SqlSessionUtils">
+        <level value="error"/>
+        <appender-ref ref="console" />
+    </logger>
+    
+    <!-- 3rdparty Loggers -->
+	<logger name="org.springframework.core"  additivity="false">
+		<level value="info" />
+        <appender-ref ref="console"/>
+	</logger>
+	
+	<logger name="org.springframework.beans"  additivity="false">
+		<level value="info" />
+        <appender-ref ref="console"/>
+	</logger>
+	
+	<logger name="org.springframework.context"  additivity="false">
+		<level value="info" />
+        <appender-ref ref="console"/>
+	</logger>
+
+	<logger name="org.springframework.web"  additivity="false">
+		<level value="info" />
+        <appender-ref ref="console"/>
+	</logger>
+	
+	<root level="error">
+		<appender-ref ref="console" />
+	</root>
+</configuration>

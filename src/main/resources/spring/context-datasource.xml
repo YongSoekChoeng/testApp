@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+	<!-- 원본은 Jasypt로 ENC(...) 암호화된 값을 읽는 EncryptablePropertyPlaceholderConfigurer를 썼지만,
+	     이 테스트 프로젝트는 로컬 전용 평문 설정이라 일반 PropertyPlaceholderConfigurer로 대체했다. -->
+	<context:property-placeholder location="classpath:/properties/globals.xml" />
+
+	<!--
+		원본(cms4_prd)은 Oracle(CMS 메인) + MariaDB(ANYBIZ/ERP) + MariaDB(RELAY/정보계) 3개 데이터소스를 썼다.
+		이 테스트 프로젝트는 로그인 + ERP + 공통코드 + 회원관리 화면만 남기고, 전부 로컬 MySQL 하나로 합쳤다.
+		기존 Java 코드는 getSqlSession()/getSqlSessionAnybiz() 두 가지를 그대로 호출하므로,
+		두 빈 이름을 모두 같은 데이터소스에 alias로 연결해 Java/매퍼 호출부는 건드리지 않는다.
+	-->
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${Globals.DriverClassName}"/>
+		<property name="url" value="${Globals.Url}" />
+		<property name="username" value="${Globals.UserName}"/>
+		<property name="password" value="${Globals.Password}"/>
+		<property name="validationQuery" value="SELECT 1"/>
+		<property name="initialSize" value="3"/>
+		<property name="minIdle" value="3" />
+		<property name="maxTotal" value="20"/>
+		<property name="maxIdle" value="20"/>
+		<property name="maxWaitMillis" value="10000"/>
+		<property name="testOnBorrow" value="true"/>
+		<property name="testOnReturn" value="false"/>
+		<property name="testWhileIdle" value="true"/>
+		<property name="timeBetweenEvictionRunsMillis" value="60000"/>
+	</bean>
+
+	<alias name="dataSource" alias="dataSource-ANYBIZ" />
+</beans>

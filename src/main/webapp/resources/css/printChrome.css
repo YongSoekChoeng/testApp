@@ -1,0 +1,63 @@
+@charset "utf-8";
+
+body{color: black;}
+.print_hidden_obj{display: none}
+@page { margin: 5px 30px; }
+a { text-decoration: none !important; color: black !important; font-size: xx-small;}
+
+table.new_input th{font-size:12px; font-weight:normal; padding:1.8px 1px; text-align:left;}
+table.new_input td{font-size:12px; text-align:right; padding:1.8px 1px;}
+
+div.m_right05{margin-right: 40px;}
+.w03{width: 215px;}
+#header01{font-size: 11px !important;}
+.font_bold{font-weight: normal;}
+	
+table.result01 th {
+	padding: 0 !important;
+	font-weight: normal !important;
+	border-bottom: 1px solid #999;
+}
+
+table.result01 td {
+	padding: 0 .5em 0 0 !important;
+}
+
+table.new_input th{
+	font-size: xx-small;
+	padding: 0 !important;
+	margin: 0 !important;
+}
+table.new_input td{
+	font-size: xx-small;
+	padding: 0 !important;
+	margin: 0 !important;
+}
+
+table.result03 th{
+	padding: .1em 0 !important;
+	font-size: xx-small;
+	border-bottom: 1px solid #999;
+}
+
+table.result03 td{
+	font-size: xx-small;
+	padding: .1em .3em !important;
+}
+
+table.result04 th{
+	font-size: xx-small;
+	padding: 0 !important;
+	border-bottom: 1px solid #999;
+	font-weight: normal !important;
+}
+
+table.result04 td{
+	font-size: xx-small;
+	padding: 0 !important;
+	border-bottom: 1px solid #999;
+}
+
+h2{font-size: 13px; color: #999;}
+div.result_money{margin-top: 15px;}
+div.margin_t_2 { margin-top: 155px; }

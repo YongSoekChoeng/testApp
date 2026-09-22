@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Login">
+
+	<!-- 로그인 정보 조회 -->
+	<!-- 원본은 Comm.OrgTree(Oracle CONNECT BY 조직도)를 조인해 소속 조직 경로(scdpath/snmpath1~5)를
+	     같이 보여줬다. 이 테스트 프로젝트는 인사/조직 모듈(insa/org) 자체를 범위에서 뺐으므로
+	     그 컬럼들은 뺐다(로그인 계정 목록 자체는 그대로 조회된다). -->
+	<select id="selectLoginList" parameterType="kr.co.gnx.system.login.LoginVO" resultType="bmap">
+		/* login-mapper.xml selectLoginList 로그인 정보 조회  */
+		SELECT tb2.mb_id            /* 회사코드           VARCHAR(20)  */
+		     , tb2.login_id         /* 사용자 ID          VARCHAR(20)  */
+		     , tb1.emp_cd           /* 사번               VARCHAR(20)  */
+		     , tb1.emp_nm           /* 사원명 */
+		     , tb1.empsta           /* 재직여부        VARCHAR(20)   */
+		     , tb2.pwd_intzn_type   /* 비밀번호초기화여부 VARCHAR(1)   */
+		     , tb2.acct_lock_type   /* 계정잠김여부       VARCHAR(1)   */
+		     , tb2.login_autr_type  /* 2tactor 인증여부   VARCHAR(1)   */
+		     , tb4.cd_vl_nm AS login_autr_type_nm /* 2tactor 인증여부명 */
+		     , tb2.user_pwd         /* 사용자 비밀번호    VARCHAR(430) */
+		     , tb2.trns_user_pwd    /* 임시 비빌번호      VARCHAR(430) */
+		     , tb2.pwd_err_nbtm     /* 비밀번호 오류횟수  BIGINT       */
+		     , tb2.pwd_chg_dt       /* 비밀번호 변경일자  VARCHAR(8)   */
+		     , DATE_FORMAT(tb5.login_dtm,'%Y-%m-%d %H:%i:%s') AS login_dtm	/* 최근접속현황 */
+		     , tb2.memo             /* 메모               VARCHAR(200) */
+		     , tb2.in_emp_cd        /* 입력자사번         VARCHAR(20)  */
+		     , tb2.in_dtm           /* 입력일시           DATETIME     */
+		     , tb2.up_emp_cd        /* 수정자사번         VARCHAR(20)  */
+		     , tb2.up_dtm           /* 수정일시           DATETIME     */
+		  FROM (SELECT * FROM tbin_empmst WHERE mb_id = #{mb_id}) tb1 /* [IN][인사] 인사마스터 */
+		  LEFT OUTER JOIN (SELECT * FROM tbsy_login WHERE mb_id = #{mb_id}) tb2 /* [SY][시스템] 로그인 정보 */
+		    ON tb1.emp_cd = tb2.emp_cd
+          LEFT OUTER JOIN (SELECT * FROM tbcm_common_code WHERE mb_id = #{mb_id} AND grp_cmm_cd = 'LOGIN_AUTR_TYPE') tb4
+            ON tb2.login_autr_type = tb4.cd_vl
+		  LEFT OUTER JOIN (SELECT emp_cd
+								, MAX(login_dtm) AS login_dtm
+							 FROM tbsy_login_hist
+							WHERE mb_id = #{mb_id}
+						 GROUP BY emp_cd) tb5
+		    ON tb1.emp_cd = tb5.emp_cd
+		 WHERE 1 = 1
+           AND tb1.emp_cd NOT IN (<include refid="Comm.RoleExcepcion"/>)
+		<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(srch_emp_value)'>
+		   AND (  tb1.emp_nm LIKE CONCAT('%',#{srch_emp_value},'%')
+			   OR tb1.emp_cd LIKE CONCAT('%',UPPER(#{srch_emp_value}),'%')
+		   )
+		</if>
+		<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(srch_empsta)'>
+		   AND tb1.empsta = #{srch_empsta}
+		</if>
+		<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(pwd_intzn_type)'>
+		   AND tb2.pwd_intzn_type = #{pwd_intzn_type}
+		</if>
+		<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(acct_lock_type)'>
+		   AND tb2.acct_lock_type = #{acct_lock_type}
+		</if>
+		<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(login_autr_type)'>
+		   AND tb2.login_autr_type = #{login_autr_type}
+		</if>
+	</select>
+
+	<!-- 로그인 정보 저장 -->
+	<insert id="insertLogin" parameterType="kr.co.gnx.system.login.LoginVO">
+		/* login-mapper.xml insertLogin 로그인 정보 저장 */
+		INSERT
+		  INTO tbsy_login /* [SY][시스템] 로그인 정보 */
+		     ( mb_id            /* 회사코드           VARCHAR(20)  */
+		     , login_id         /* 사용자 ID          VARCHAR(20)  */
+		     , emp_cd           /* 사번               VARCHAR(20)  */
+		     , pwd_intzn_type   /* 비밀번호초기화여부 VARCHAR(1)   */
+		     , acct_lock_type   /* 계정잠김여부       VARCHAR(1)   */
+		     , login_autr_type  /* 2tactor 인증여부       VARCHAR(1)   */
+		     , user_pwd         /* 사용자 비밀번호    VARCHAR(430) */
+		     , trns_user_pwd    /* 임시 비빌번호      VARCHAR(430) */
+		     , pwd_err_nbtm     /* 비밀번호 오류횟수  BIGINT       */
+		     , pwd_chg_dt       /* 비밀번호 변경일자  VARCHAR(8)   */
+		     , memo             /* 메모               VARCHAR(200) */
+		     , in_emp_cd        /* 입력자사번         VARCHAR(20)  */
+		     , in_dtm           /* 입력일시           DATETIME     */
+		     , up_emp_cd        /* 수정자사번         VARCHAR(20)  */
+		     , up_dtm           /* 수정일시           DATETIME     */
+		     )
+		VALUES
+		     ( #{mb_id}   /* 회사코드           VARCHAR(20)  */
+		     , #{login_id}   /* 사용자 ID          VARCHAR(20)  */
+		     , #{emp_cd}   /* 사번               VARCHAR(20)  */
+		     , #{pwd_intzn_type}   /* 비밀번호초기화여부 VARCHAR(1)   */
+		     , #{acct_lock_type}   /* 계정잠김여부       VARCHAR(1)   */
+		     , #{login_autr_type}  /* 2tactor 인증여부       VARCHAR(1)   */
+		     , #{user_pwd}   /* 사용자 비밀번호    VARCHAR(430) */
+		     , #{trns_user_pwd}   /* 임시 비빌번호      VARCHAR(430) */
+		     , #{pwd_err_nbtm}    /* 비밀번호 오류횟수  BIGINT       */
+		     , #{pwd_chg_dt}    /* 비밀번호 변경일자  VARCHAR(8)   */
+		     , #{memo}    /* 메모               VARCHAR(200) */
+		     , #{in_emp_cd}    /* 입력자사번         VARCHAR(20)  */
+		     , NOW()    /* 입력일시           DATETIME     */
+		     , null    /* 수정자사번         VARCHAR(20)  */
+		     , null    /* 수정일시           DATETIME     */
+		     )
+	</insert>
+	
+	<!-- 로그인 정보 수정 -->
+	<update id="updateLogin" parameterType="kr.co.gnx.system.login.LoginVO">
+		/* login-mapper.xml updateLogin 로그인 정보 수정 */
+		UPDATE tbsy_login /* [SY][시스템] 로그인 정보 */
+		   SET up_emp_cd     = #{up_emp_cd}        /* 수정자사번         VARCHAR(20)  */
+		     , up_dtm        = NOW()               /* 수정일시           DATETIME     */
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(pwd_intzn_type)'>
+		     , pwd_intzn_type  = #{pwd_intzn_type}     /* 비밀번호초기화여부 VARCHAR(1)   */
+			</if>
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(acct_lock_type)'>
+		     , acct_lock_type  = #{acct_lock_type}     /* 계정잠김여부       VARCHAR(1)   */
+			</if>
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(login_autr_type)'>
+		     , login_autr_type = #{login_autr_type}    /* 2tactor 인증여부       VARCHAR(1)   */
+			</if>
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(user_pwd)'>
+		     , user_pwd      = #{user_pwd}         /* 사용자 비밀번호    VARCHAR(430) */
+			</if>
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(trns_user_pwd)'>
+		     , trns_user_pwd = #{trns_user_pwd}    /* 임시 비빌번호      VARCHAR(430) */
+			</if>
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(pwd_err_nbtm)'>
+		     , pwd_err_nbtm  = #{pwd_err_nbtm}     /* 비밀번호 오류횟수  BIGINT       */
+			</if>
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(pwd_chg_dt)'>
+		     , pwd_chg_dt    = #{pwd_chg_dt}       /* 비밀번호 변경일자  VARCHAR(8)   */
+			</if>
+			<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(memo)'>
+		     , memo          = #{memo}             /* 메모               VARCHAR(200) */
+			</if>
+		 WHERE mb_id = #{mb_id}
+		   AND emp_cd = #{emp_cd}
+	</update>
+	
+	<!-- 로그인 정보 삭제 -->
+	<delete id="deleteLogin" parameterType="kr.co.gnx.system.login.LoginVO">
+		/* login-mapper.xml deleteLogin 로그인 정보 삭제 */
+		DELETE
+		  FROM tbsy_login
+		 WHERE mb_id = #{mb_id}
+		   AND emp_cd = #{emp_cd}
+	</delete>
+	
+	<!-- 로그인 이력 저장 -->
+	<insert id="insertLoginHist" parameterType="kr.co.gnx.system.login.LoginVO">
+		/* login-mapper.xml insertLoginHist 로그인 이력 저장 */
+		INSERT
+		  INTO tbsy_login_hist /* [SY][시스템] 로그인 이력관리 */
+		     ( mb_id        /* 회사코드   VARCHAR(20)  */
+		     , emp_cd       /* 사원코드   VARCHAR(20)  */
+		     , login_ip     /* 로그인IP   VARCHAR(40)  */
+		     , login_dtm    /* 로그인일시 DATETIME     */
+		     , memo         /* 메모       VARCHAR(200) */
+		     )
+		VALUES
+		     ( #{mb_id}       /* 회사코드   VARCHAR(20)  */
+		     , #{emp_cd}      /* 사원코드   VARCHAR(20)  */
+		     , #{login_ip}    /* 로그인IP   VARCHAR(40)  */
+		     , NOW()          /* 로그인일시 DATETIME     */
+		     , #{memo}        /* 메모       VARCHAR(200) */
+		     )
+	</insert>
+	
+	<delete id="deleteLoginInfo" parameterType="kr.co.gnx.system.login.LoginVO">
+		/* comm-mapper.xml id="deleteLoginInfo" 로그인 정보  입력전 삭제 */
+		DELETE
+		  FROM tbsy_login
+		 WHERE mb_id = #{mb_id}
+		   AND emp_cd NOT IN (<include refid="Comm.RoleExcepcion"/>)
+	</delete>
+	
+	<select id="getEmpcd" parameterType="kr.co.gnx.system.login.LoginVO" resultType="String">
+		/* comm-mapper.xml id="getEmpcd" 로그인 정보  입력전 삭제 */
+		SELECT emp_cd
+		  FROM tbsy_login
+		 WHERE mb_id = #{mb_id}
+		   AND login_id = #{user_id}
+	</select>
+	
+	<select id="selectLoginInfoView" parameterType="kr.co.gnx.system.login.LoginVO" resultType="kr.co.gnx.system.login.LoginVO">
+		/* login-mapper.xml selectOneLoginInfo 로그인정보 조회 */
+		SELECT tb1.*
+		     , tb2.emp_nm
+		     , tb2.hpno
+		     , tb2.email
+		     , tb3.mb_nm
+		  FROM tbsy_login tb1
+    INNER JOIN tbin_empmst tb2
+            ON tb1.emp_cd = tb2.emp_cd
+    INNER JOIN tbsy_member tb3
+            ON tb1.mb_id = tb3.mb_id
+		 WHERE 1=1
+		<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(login_id)'>
+		   AND tb1.login_id = #{login_id}
+		</if>
+		<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(emp_nm)'>
+		   AND tb2.emp_nm = #{emp_nm}
+		</if>
+	</select>
+	
+	<select id="selectLoginInfoList" parameterType="kr.co.gnx.system.login.LoginVO" resultType="dmap">
+		/* login-mapper.xml selectLoginInfoList 로그인정보 조회 */
+		SELECT tb1.*
+		     , tb2.emp_nm
+		     , tb2.telno
+		     , tb2.email
+		     , tb3.mb_nm
+		  FROM tbsy_login tb1
+    INNER JOIN tbin_empmst tb2
+            ON tb1.emp_cd = tb2.emp_cd
+    INNER JOIN tbsy_member tb3
+            ON tb1.mb_id = tb3.mb_id
+		 WHERE 1=1
+		<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(login_id)'>
+		   AND tb1.login_id = #{login_id}
+		</if>
+		<if test='@kr.co.gnx.comm.util.CommUtil@isNotEmpty(emp_nm)'>
+		   AND tb2.emp_nm = #{emp_nm}
+		</if>
+	</select>
+	
+	<select id="selectLoginHistCount" parameterType="kr.co.gnx.system.login.LoginVO" resultType="String">
+		/* login-mapper.xml selectLoginHistCount 로그인 이력 횟수 조회 */
+		SELECT COUNT(*)
+		  FROM tbsy_login_hist
+		 WHERE mb_id	= #{mb_id}
+		   AND emp_cd	= #{emp_cd}
+	</select>
+	
+	<select id="selectClearPassList" resultType="hmap">
+			SELECT tb1.mb_id
+				 , tb1.emp_cd
+				 , tb1.emp_nm
+				 , SUBSTRING(tb1.perno, 1, 6) AS password
+			  FROM tbin_empmst tb1
+			 WHERE tb1.mb_id = 'PRD'
+			   AND tb1.empsta = '재직'
+			   AND tb1.emp_cd NOT IN ('SADMIN', 'ADMIN', 'RPA','INSCOM','INSCOMNVL', '999999999');
+	</select>
+	
+		<!-- 로그인 정보 수정 -->
+	<update id="updatePwdErrNbtm" parameterType="kr.co.gnx.system.login.LoginVO">
+		/* login-mapper.xml updatePwdErrNbtm 비밀번호 오류 횟수 증가 */
+		UPDATE tbsy_login /* [SY][시스템] 로그인 정보 */
+		   SET pwd_err_nbtm  = pwd_err_nbtm + 1    /* 비밀번호 오류횟수  BIGINT       */
+		 WHERE mb_id = #{mb_id}
+		   AND login_id = #{login_id}
+		   AND emp_cd NOT IN (<include refid="Comm.RoleExcepcion"/>)
+	</update>			
+	
+	
+</mapper>
