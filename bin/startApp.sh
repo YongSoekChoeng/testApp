@@ -5,7 +5,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-TOMCAT_HOME="${TOMCAT_HOME:-/app/tomcat9}"
+TOMCAT_HOME="${TOMCAT_HOME:-/opt/tomcat9}"
 export JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-21-openjdk-amd64}"
 
 if [ ! -d "$TOMCAT_HOME" ]; then
