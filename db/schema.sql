@@ -260,3 +260,35 @@ CREATE TABLE tbsy_join_hist (
     in_dtm     DATETIME     NULL,
     PRIMARY KEY (seq)
 );
+
+-- [SY] 메뉴(리소스) - index.jsp가 /menu/getMenuList.ajax로 읽어 상단/좌측 메뉴를 그린다.
+-- prnt_resource_id가 NULL이면 최상위(상단) 메뉴. 하위메뉴가 있는 메뉴는 resource_url='NONE'.
+CREATE TABLE tbsy_resource (
+    mb_id             VARCHAR(20)  NOT NULL,
+    resource_id       VARCHAR(20)  NOT NULL,
+    prnt_resource_id  VARCHAR(20)  NULL,
+    resource_name     VARCHAR(100) NOT NULL,
+    resource_url      VARCHAR(200) NULL DEFAULT 'NONE',
+    sort_no           INT          NOT NULL DEFAULT 0,
+    use_yn            VARCHAR(1)   NOT NULL DEFAULT 'Y',
+    in_emp_cd         VARCHAR(20)  NULL,
+    in_dtm            DATETIME     NULL,
+    up_emp_cd         VARCHAR(20)  NULL,
+    up_dtm            DATETIME     NULL,
+    PRIMARY KEY (mb_id, resource_id)
+);
+
+-- [TS] 샘플게시판 - 테스트 메뉴용 CRUD(삭제는 use_yn='N')
+CREATE TABLE tbts_sample_board (
+    seq        BIGINT        NOT NULL AUTO_INCREMENT,
+    mb_id      VARCHAR(20)   NOT NULL,
+    title      VARCHAR(200)  NOT NULL,
+    content    VARCHAR(4000) NULL,
+    writer_nm  VARCHAR(50)   NULL,
+    use_yn     VARCHAR(1)    NOT NULL DEFAULT 'Y',
+    in_emp_cd  VARCHAR(20)   NULL,
+    in_dtm     DATETIME      NULL,
+    up_emp_cd  VARCHAR(20)   NULL,
+    up_dtm     DATETIME      NULL,
+    PRIMARY KEY (seq)
+);

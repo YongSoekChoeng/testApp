@@ -59,3 +59,22 @@ INSERT INTO tbcm_common_code (mb_id, grp_cmm_cd, cd_vl, cd_vl_nm, use_yn, sort_n
     ('PRD', 'ATTACH_GBN', 'GENERAL', '일반첨부', 'Y', 10, 'ADMIN001', NOW()),
     ('PRD', 'TEST_GROUP', 'A001', '샘플코드1', 'Y', 10, 'ADMIN001', NOW()),
     ('PRD', 'TEST_GROUP', 'A002', '샘플코드2', 'Y', 20, 'ADMIN001', NOW());
+
+-- 테스트용 메뉴 3개(상단) + 하위메뉴
+--   시스템관리 > 공통코드관리 / 회원사관리
+--   로그조회   > 로그인이력 / 액션로그 / 에러로그
+--   테스트     > 샘플게시판(서버 CRUD 모듈 확인용)
+INSERT INTO tbsy_resource (mb_id, resource_id, prnt_resource_id, resource_name, resource_url, sort_no, use_yn, in_emp_cd, in_dtm) VALUES
+    ('PRD', 'SY_000', NULL,     '시스템관리',   'NONE',                      10, 'Y', 'ADMIN001', NOW()),
+    ('PRD', 'SY_100', 'SY_000', '공통코드관리', '/commoncode/commoncode.go', 10, 'Y', 'ADMIN001', NOW()),
+    ('PRD', 'SY_200', 'SY_000', '회원사관리',   '/system/member/member.go',  20, 'Y', 'ADMIN001', NOW()),
+    ('PRD', 'LG_000', NULL,     '로그조회',     'NONE',                      20, 'Y', 'ADMIN001', NOW()),
+    ('PRD', 'LG_100', 'LG_000', '로그인이력',   '/logs/loginHist.go',        10, 'Y', 'ADMIN001', NOW()),
+    ('PRD', 'LG_200', 'LG_000', '액션로그',     '/logs/actionLog.go',        20, 'Y', 'ADMIN001', NOW()),
+    ('PRD', 'LG_300', 'LG_000', '에러로그',     '/logs/errorLog.go',         30, 'Y', 'ADMIN001', NOW()),
+    ('PRD', 'TS_000', NULL,     '테스트',       'NONE',                      30, 'Y', 'ADMIN001', NOW()),
+    ('PRD', 'TS_100', 'TS_000', '샘플게시판',   '/sample/board/sampleBoard.go', 10, 'Y', 'ADMIN001', NOW());
+
+INSERT INTO tbts_sample_board (mb_id, title, content, writer_nm, use_yn, in_emp_cd, in_dtm) VALUES
+    ('PRD', '첫 번째 샘플 글', '샘플게시판 조회 확인용 데이터입니다.', '관리자', 'Y', 'ADMIN001', NOW()),
+    ('PRD', '두 번째 샘플 글', '수정/삭제 테스트에 사용하세요.',       '관리자', 'Y', 'ADMIN001', NOW());

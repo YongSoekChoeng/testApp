@@ -18,7 +18,11 @@
 					 ORDER BY ${sort_column}
 				</if>
 			   ) AA
-		 LIMIT ${pageSize} OFFSET ${(page-1)*pageSize}
+		<!-- page/pageSize는 문자열이라 그대로 곱하면 OGNL이 실수(0.0)를 만들어 MySQL 문법 오류가 난다.
+		     정수로 바꿔서 계산하고, 값이 없으면 1페이지/20건으로 본다. -->
+		<bind name="_pageNo"   value="@kr.co.gnx.comm.util.CommUtil@isEmpty(page)     ? 1  : @java.lang.Integer@parseInt(page)"/>
+		<bind name="_pageSize" value="@kr.co.gnx.comm.util.CommUtil@isEmpty(pageSize) ? 20 : @java.lang.Integer@parseInt(pageSize)"/>
+		 LIMIT ${_pageSize} OFFSET ${(_pageNo - 1) * _pageSize}
 	</sql>
 	
 	<sql id="CountStart">
