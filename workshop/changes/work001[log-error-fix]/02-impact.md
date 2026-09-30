@@ -1,43 +1,42 @@
-# 영향도 분석 보고서 (Impact Analysis Report)
+# 영향도 분석서
 
-## 1. 진입점 (Entry Points)
+## 1. 진입점 (화면/API/배치) 목록
 - **화면 (JSP)**
-  - `D:/AppHome/testApp/src/main/webapp/WEB-INF/views/logs/errorLog.jsp` (에러 로그 조회)
-  - `D:/AppHome/testApp/src/main/webapp/WEB-INF/views/logs/actionLog.jsp` (액션 로그 조회)
-  - `D:/AppHome/testApp/src/main/webapp/WEB-INF/views/logs/loginHist.jsp` (로그인 이력 조회)
-- **API (Controller)**
-  - `kr.co.gnx.logs.LogsController`
-    - `/logs/getErrorLogList.ajax`
-    - `/logs/getActionLogList.ajax`
-    - `/logs/getLoginHistList.ajax`
+  - `/logs/loginHist.go` (로그인이력 조회 화면)
+  - `/logs/actionLog.go` (액션로그 조회 화면)
+  - `/logs/errorLog.go` (에러로그 조회 화면)
+- **API (Ajax)**
+  - `/logs/getLoginHistList.ajax`
+  - `/logs/getActionLogList.ajax`
+  - `/logs/getErrorLogList.ajax`
 
 ## 2. 변경 대상
 | 파일 경로 | 변경 유형 | 이유 |
 | :--- | :---: | :--- |
-| `D:/AppHome/testApp/src/main/webapp/WEB-INF/views/logs/errorLog.jsp` | 수정 | `<input type="hidden" name="sort_column" id="sort_column" value="seq desc"/>`에서 존재하지 않는 `seq` 컬럼을 `in_dtm desc`로 변경 (FR-01) |
-| `D:/AppHome/testApp/src/main/webapp/WEB-INF/views/logs/actionLog.jsp` | 수정 | `<input type="hidden" name="sort_column" id="sort_column" value="seq desc"/>`에서 존재하지 않는 `seq` 컬럼을 `in_dtm desc`로 변경 (FR-02) |
-| `D:/AppHome/testApp/src/main/webapp/WEB-INF/views/logs/loginHist.jsp` | 수정 | `<input type="hidden" name="sort_column" id="sort_column" value="seq desc"/>`에서 존재하지 않는 `seq` 컬럼을 `login_dtm desc`로 변경 (FR-03) |
-| `D:/AppHome/testApp/src/main/resources/sqlmap/mapper/system/logs-mapper.xml` | 확인 | `selectErrorLogList`, `selectActionLogList`, `selectLoginHistList` 쿼리 내 정렬 조건이 `sort_column` 파라미터에 의해 동적으로 결정되므로, JSP에서 전달하는 컬럼명이 DB 테이블(`tbsy_error_log`, `tbsy_action_log`, `tbsy_login_hist`)에 존재하는지 검증 필요. |
+| `src/main/resources/sqlmap/mapper/system/logs-mapper.xml` | 수정 | `selectActionLogListSql` 및 `selectErrorLogListSql` 내 존재하지 않는 `seq` 컬럼 정렬 조건 제거 또는 유효한 컬럼(`in_dtm`)으로 변경 (FR-01, FR-02, FR-03) |
 
-## 3. 영향 받는 호출자 · 연계 시스템 · DB 객체
-- **호출자 (Service/DAO)**
-  - `kr.co.gnx.logs.LogsService` (조회 메서드들)
-  - `kr.co.gnx.logs.LogsDAO` (MyBatis 호출 메서드들)
-- **DB 객체 (Table)**
-  - `tbsy_error_log` (정렬 컬럼: `in_dtm`)
-  - `tbsy_action_log` (정렬 컬럼: `in_dtm`)
-  - `tbsy_login_hist` (정렬 컬럼: `login_dtm`)
+## 3. 영향 받는 호출자·연계 시스템·DB 객체
+- **호출자 (Java Class)**
+  - `kr.co.gnx.logs.LogsController`: 각 로그 리스트 조회 요청 처리
+  - `kr.co.gnx.logs.LogsService`: DAO 호출을 통한 데이터 조회 로직 수행
+  - `kr.co.gnx.logs.LogsDAO`: MyBatis를 통한 SQL 실행
+- **DB 객체**
+  - `tbsy_error_log`: 에러 로그 테이블 (조회 쿼리 영향)
+  - `tbsy_action_log`: 액션 로그 테이블 (조회 쿼리 영향)
+  - `tbsy_login_hist`: 로그인 이력 테이블 (참조용)
+  - `tbin_empmst`: 사원 마스터 테이블 (조인 대상)
+  - `tbcm_common_code`: 공통 코드 테이블 (조인 대상)
 
 ## 4. 재사용 가능한 기존 컴포넌트
-- `Comm.PagingStart`, `Comm.PagingEnd` (MyBatis 공통 페이징 SQL)
-- `kr.co.gnx.comm.util.CommUtil` (파라미터 유효성 검사)
-- `genexon.getSearchParameterToJsonString()` (JSP 내 검색 파라미터 직렬화)
+- `kr.co.gnx.base.BaseDAO`, `BaseService`, `BaseController`: 공통 기능 활용
+- `kr.co.gnx.comm.util.CommUtil`: 파라미터 유효성 검사 및 페이징 처리 활용
+- `Comm.PagingStart`, `Comm.PagingEnd`: MyBatis 공통 페이징 SQL 조각 활용
 
 ## 5. 위험 요소와 회귀 테스트가 필요한 기존 기능
-- **위험 요소**:
-  - JSP에서 `sort_column` 값을 하드코딩하여 전달하고 있으므로, 만약 사용자가 그리드 헤더를 클릭하여 정렬을 변경할 경우, 변경된 컬럼명이 DB에 존재하지 않으면 동일한 SQL 에러가 재발할 수 있음.
-  - `Comm.PagingEnd`에서 `${sort_column}`을 그대로 `ORDER BY` 절에 삽입하므로 SQL Injection 위험이 존재함 (단, 현재는 내부 관리용 메뉴이므로 위험도는 낮음).
-- **회귀 테스트 필요 기능**:
-  - 각 로그 조회 화면의 **페이징 처리** 기능 (정렬 조건 변경 후 페이지 이동이 정상적인지 확인).
-  - 각 로그 조회 화면의 **검색 기능** (정렬 조건과 검색 조건이 결합되었을 때 정상 동작 확인).
-  - **로그 데이터의 정렬 순서**가 의도한 대로(최신순) 표시되는지 확인.
+- **위험 요소**
+  - 정렬 기준 컬럼 변경 시, 기존 사용자가 기대하던 정렬 순서(예: 특정 ID 순)가 달라질 수 있음.
+  - `in_dtm` 컬럼에 인덱스가 없을 경우, 데이터 양 증가에 따른 조회 성능 저하 가능성 (비기능 요구사항 관련).
+- **회귀 테스트 필요 기능**
+  - 로그인이력, 액션로그, 에러로그의 전체 리스트 조회 기능.
+  - 검색 조건(회사코드, 기간, 사원명 등) 적용 시 데이터 필터링 및 페이징 정상 동작 여부.
+  - 정렬 기능이 화면 UI에서 정상적으로 작동하는지 확인.
