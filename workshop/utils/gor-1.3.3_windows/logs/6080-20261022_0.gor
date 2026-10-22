@@ -1,0 +1,181 @@
+1 dff417c00000000180efe38c 1792635354487971300 0
+POST /comm/getAuthCheck.ajax HTTP/1.1
+Host: localhost:6080
+Connection: keep-alive
+Content-Length: 43
+sec-ch-ua-platform: "Windows"
+X-Requested-With: XMLHttpRequest
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36
+Accept: application/json, text/javascript, */*; q=0.01
+sec-ch-ua: "Google Chrome";v="155", "Chromium";v="155", "Not(A:Brand";v="24"
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+sec-ch-ua-mobile: ?0
+Origin: http://localhost:6080
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: http://localhost:6080/login.go?type=index
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+Cookie: jenkins-timestamper-offset=-32400000; _SAVED_ID_KEY_=admin-undefined; JSESSIONID=C1E4A928791F2D273AAD0453053EC175
+
+mb_id=PRD&login_id=admin&login_pw=test1234!
+🐵🙈🙉
+1 dff417c00000000180eff7a0 1792635355138204200 0
+POST /login.do HTTP/1.1
+Host: localhost:6080
+Connection: keep-alive
+Content-Length: 45
+Cache-Control: max-age=0
+sec-ch-ua: "Google Chrome";v="155", "Chromium";v="155", "Not(A:Brand";v="24"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Windows"
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36
+Origin: http://localhost:6080
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/jxl,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Sec-Fetch-Dest: document
+Referer: http://localhost:6080/login.go?type=index
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+Cookie: jenkins-timestamper-offset=-32400000; _SAVED_ID_KEY_=admin-undefined; JSESSIONID=C1E4A928791F2D273AAD0453053EC175
+
+mb_id=PRD&login_id=admin&login_pw=test1234%21
+🐵🙈🙉
+1 dff417c00000000180eff900 1792635355375668900 0
+GET /index.go HTTP/1.1
+Host: localhost:6080
+Connection: keep-alive
+Cache-Control: max-age=0
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/jxl,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Sec-Fetch-Dest: document
+sec-ch-ua: "Google Chrome";v="155", "Chromium";v="155", "Not(A:Brand";v="24"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Windows"
+Referer: http://localhost:6080/login.go?type=index
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+Cookie: jenkins-timestamper-offset=-32400000; _SAVED_ID_KEY_=admin-undefined; JSESSIONID=FF1E557BCDD2E2BFBCAF82CD352BD1E3
+
+
+🐵🙈🙉
+1 dff417c00000000180f05c44 1792635355571162600 0
+POST /menu/getMenuList.ajax HTTP/1.1
+Host: localhost:6080
+Connection: keep-alive
+Content-Length: 42
+sec-ch-ua-platform: "Windows"
+X-Requested-With: XMLHttpRequest
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36
+Accept: application/json, text/javascript, */*; q=0.01
+sec-ch-ua: "Google Chrome";v="155", "Chromium";v="155", "Not(A:Brand";v="24"
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+sec-ch-ua-mobile: ?0
+Origin: http://localhost:6080
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: http://localhost:6080/index.go
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+Cookie: jenkins-timestamper-offset=-32400000; _SAVED_ID_KEY_=admin-undefined; JSESSIONID=FF1E557BCDD2E2BFBCAF82CD352BD1E3
+
+_csrf=be7462ae-4044-4684-b4a4-ee74bfbc45e1
+🐵🙈🙉
+1 dff417c00000000180f063a5 1792635366747509800 0
+POST /main/sessionExtension.ajax?_csrf=be7462ae-4044-4684-b4a4-ee74bfbc45e1 HTTP/1.1
+Host: localhost:6080
+Connection: keep-alive
+Content-Length: 0
+sec-ch-ua-platform: "Windows"
+X-Requested-With: XMLHttpRequest
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36
+Accept: application/json, text/javascript, */*; q=0.01
+sec-ch-ua: "Google Chrome";v="155", "Chromium";v="155", "Not(A:Brand";v="24"
+sec-ch-ua-mobile: ?0
+Origin: http://localhost:6080
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: http://localhost:6080/index.go
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+Cookie: jenkins-timestamper-offset=-32400000; _SAVED_ID_KEY_=admin-undefined; JSESSIONID=FF1E557BCDD2E2BFBCAF82CD352BD1E3
+
+
+🐵🙈🙉
+1 dff417c00000000180f064e8 1792635366801736500 0
+POST /commoncode/commoncode.go HTTP/1.1
+Host: localhost:6080
+Connection: keep-alive
+Content-Length: 42
+Cache-Control: max-age=0
+sec-ch-ua: "Google Chrome";v="155", "Chromium";v="155", "Not(A:Brand";v="24"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "Windows"
+Upgrade-Insecure-Requests: 1
+Content-Type: application/x-www-form-urlencoded
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36
+Origin: http://localhost:6080
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/jxl,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Sec-Fetch-Dest: iframe
+Referer: http://localhost:6080/index.go
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+Cookie: jenkins-timestamper-offset=-32400000; _SAVED_ID_KEY_=admin-undefined; JSESSIONID=FF1E557BCDD2E2BFBCAF82CD352BD1E3
+
+_csrf=be7462ae-4044-4684-b4a4-ee74bfbc45e1
+🐵🙈🙉
+1 dff417c00000000180f0b43a 1792635366920964000 0
+GET /resources/images/img_search_line.png HTTP/1.1
+Host: localhost:6080
+Connection: keep-alive
+sec-ch-ua-platform: "Windows"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36
+sec-ch-ua: "Google Chrome";v="155", "Chromium";v="155", "Not(A:Brand";v="24"
+sec-ch-ua-mobile: ?0
+Accept: image/jxl,image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: image
+Referer: http://localhost:6080/resources/css/search.css
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+Cookie: jenkins-timestamper-offset=-32400000; _SAVED_ID_KEY_=admin-undefined; JSESSIONID=FF1E557BCDD2E2BFBCAF82CD352BD1E3
+
+
+🐵🙈🙉
+1 dff417c00000000180f0bbca 1792635366954374200 0
+POST /commoncode/getCommonCodeGroup.ajax?_csrf=be7462ae-4044-4684-b4a4-ee74bfbc45e1 HTTP/1.1
+Host: localhost:6080
+Connection: keep-alive
+Content-Length: 0
+sec-ch-ua-platform: "Windows"
+X-Requested-With: XMLHttpRequest
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36
+Accept: application/json, text/javascript, */*; q=0.01
+sec-ch-ua: "Google Chrome";v="155", "Chromium";v="155", "Not(A:Brand";v="24"
+sec-ch-ua-mobile: ?0
+Origin: http://localhost:6080
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: http://localhost:6080/commoncode/commoncode.go
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7
+Cookie: jenkins-timestamper-offset=-32400000; _SAVED_ID_KEY_=admin-undefined; JSESSIONID=FF1E557BCDD2E2BFBCAF82CD352BD1E3
+
+
+🐵🙈🙉
