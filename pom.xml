@@ -49,7 +49,7 @@
 		<poi.version>4.0.1</poi.version>
 		
 		<aspectjrt.version>1.8.13</aspectjrt.version>
-		<aspectjweaver.version>1.9.1</aspectjweaver.version>
+		<aspectjweaver.version>1.9.6</aspectjweaver.version>
 		<sitemesh.version>3.0.1</sitemesh.version>
 		
 		<commons-lang.version>2.6</commons-lang.version>
