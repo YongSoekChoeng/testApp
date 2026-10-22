@@ -12,13 +12,22 @@
 		globals.xml을 다시 읽는다(원본의 dev/real 접두어 방식과 동일한 구조, 접두어만 "local"로 바꿨다).
 	</comment>
 	<entry key="Globals.DriverClassName">com.mysql.cj.jdbc.Driver</entry>
-	<entry key="Globals.Url">jdbc:mysql://127.0.0.1:3306/testApp?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=Asia/Seoul&amp;characterEncoding=UTF-8</entry>
+	<entry key="Globals.Url">jdbc:mysql://localhost:3306/testApp?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=Asia/Seoul&amp;characterEncoding=UTF-8</entry>
 	<entry key="Globals.UserName">testapp</entry>
 	<entry key="Globals.Password">Testapp1234!</entry>
 	<entry key="Globals.apiConnectUrl">LOCAL</entry>
 
 	<entry key="Globals.DBGubun">local</entry>
 	<entry key="local.Globals.LogerYN">Y</entry>
+	
 	<entry key="local.Globals.httpdomain">http://localhost:6080/</entry>
 	<entry key="local.Globals.ANYBIZ_ErpUrl">http://localhost:6080/</entry>
+	
+	<!--  
+	<entry key="local.Globals.httpdomain">http://localhost:6080/</entry>
+	<entry key="local.Globals.ANYBIZ_ErpUrl">http://localhost:6080/</entry>
+	
+	<entry key="local.Globals.httpdomain">http://localhost:6080/</entry>
+	<entry key="local.Globals.ANYBIZ_ErpUrl">http://localhost:6080/</entry>
+	-->
 </properties>
