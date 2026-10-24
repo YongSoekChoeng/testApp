@@ -54,6 +54,7 @@ public class InterceptorAdapter extends HandlerInterceptorAdapter {
 		
 	    try {
 	    	String url = request.getRequestURI();
+System.out.println("=======================================================>>> line 57 url:" + url);   	
 	    	if(url.contains("/css/")
 	    			|| url.contains("/js/")
 	    			|| url.contains("/images/")
@@ -94,6 +95,7 @@ public class InterceptorAdapter extends HandlerInterceptorAdapter {
 	    	//인덱스에서 메뉴조회, 세션유지, index.go 이동, ddcode 공통코드 조회를 제외한 나머지 액션
 	    	HttpSession session = request.getSession(true);
     		SessionVO sessionVO = SessionUtil.getSessionVO(session);
+System.out.println("=======================================================>>> line 97 sessionVO:" + sessionVO);   		
     		User user = new User();
 			ActionLogVO actionLogVO = new ActionLogVO();
 
@@ -108,6 +110,7 @@ public class InterceptorAdapter extends HandlerInterceptorAdapter {
 
 	    	// 메뉴별 상세 권한(조회/수정/삭제 등) 조회는 이 테스트 프로젝트 범위에서 제외 - 로그인 여부만으로 접근을 허용한다.
 
+System.out.println("=======================================================>>> line 112 action_log_yn:" + action_log_yn);   		
 	    	//액션 로그
 	    	if(exceptionActionLogUrl(url, action_log_yn)) {
 				try {

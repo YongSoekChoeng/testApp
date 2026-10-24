@@ -32,6 +32,15 @@
 		
 		<logout invalidate-session="true" logout-success-url="/login.go" logout-url="/logout.do" />
 		<csrf request-matcher-ref="csrfSecurityRequestMatcher"/>
+		
+		<!-- ================================================================= -->
+		<!-- 여기서부터 동시 로그인 허용 설정 추가 시작 -->
+		<!-- ================================================================= -->
+		<session-management>
+		    <concurrency-control max-sessions="-1" error-if-maximum-exceeded="false" />
+		</session-management>
+		<!-- ================================================================= -->
+		
     </http>
     
 	<beans:bean id="jwtAuthenticationFilter" class="kr.co.gnx.filter.JwtAuthenticationFilter" />
