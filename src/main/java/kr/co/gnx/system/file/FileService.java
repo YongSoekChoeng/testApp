@@ -442,17 +442,17 @@ public class FileService extends BaseService{
 		String fullPath =  filePath + retunfilename ; // upload폴더명/저장파일명.확장자
 
 		
-		logger.debug("#####################################");
-		logger.debug("UUID 파일명: " + fileId);
-		logger.debug("원본 파일명: " + fileName);
-		logger.debug("확장자: " + fileFormat);
-		logger.debug("파일 PATH : " + fileUrl);
-		logger.debug("파일 REAL PATH : " + fullPath);
-		logger.debug("파일 사이즈 : " + fileSize);
-		logger.debug("파일 mime : " + mine);
-		logger.debug("#####################################");	
-		logger.debug("");
-		logger.debug("");
+		logger.info("#####################################");
+		logger.info("UUID 파일명: " + fileId);
+		logger.info("원본 파일명: " + fileName);
+		logger.info("확장자: " + fileFormat);
+		logger.info("파일 PATH : " + fileUrl);
+		logger.info("파일 REAL PATH : " + fullPath);
+		logger.info("파일 사이즈 : " + fileSize);
+		logger.info("파일 mime : " + mine);
+		logger.info("#####################################");	
+		logger.info("");
+		logger.info("");
 		
 		filevo =  new FileVO();
 		
@@ -472,7 +472,7 @@ public class FileService extends BaseService{
 		/*파일정보 저장 */
 		
 		getFileDAO().insertFileInfo(filevo);
-		logger.debug(file.getPath());
+		logger.info(file.getPath());
 		try {
 			multipartFile.transferTo(file);			
 		} catch (Exception e) {
