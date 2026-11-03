@@ -48,9 +48,9 @@ public class Startup {
 			String homePath = "";
 			
 			if("dev".equals(vo.getDBGubun())) {
-				homePath = "/data/uploadData/DEV_CMS4_PRD";	//개발
+				homePath = "/app/testApp/uploadData/DEV_CMS4_PRD";	//서버
 			}else {
-				homePath = "/data/uploadData/GX_CMS4_PRD";	// 상용
+				homePath = "D:/AppHome/testApp/uploadData/GX_CMS4_PRD";	// 로컬
 			}
 			
 			if (isWindows()) {
