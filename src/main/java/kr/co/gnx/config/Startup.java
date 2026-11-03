@@ -47,10 +47,10 @@ public class Startup {
 			String wrPath = "";
 			String homePath = "";
 			
-			if("dev".equals(vo.getDBGubun())) {
-				homePath = "/app/testApp/uploadData/DEV_CMS4_PRD";	//서버
-			}else {
+			if(OS.startsWith("windows")) {
 				homePath = "D:/AppHome/testApp/uploadData/GX_CMS4_PRD";	// 로컬
+			}else {
+				homePath = "/app/testApp/uploadData/DEV_CMS4_PRD";	//서버
 			}
 			
 			if (isWindows()) {
