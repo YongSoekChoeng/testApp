@@ -66,7 +66,7 @@ nav.gnb img {
 			<nav class="gb_gnb">
 				<div class="fl">
 					<img src="/resources/images/common/ic_1.png" class="mr10"> 
-					${session.emp_nm} 님
+					[AS-IS] ${session.emp_nm} 님
 					<span>(최종 로그인시간 ${session.login_time}) [<span onclick="javascript:sessionExt();" style="cursor: pointer; width: 80px; text-align: center; font-size: 14px;">
 																<span id="sessionTimer" style="font-size: 14px;"></span>연장
 															</span>]

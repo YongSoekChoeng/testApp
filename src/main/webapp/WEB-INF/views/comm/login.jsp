@@ -284,8 +284,8 @@ body, html {
 					
 					</c:choose>
 					
-					<li><input type="text" name="login_id" id="login_id"  placeholder="아이디" onKeyPress="if(event.keyCode==13) authCheck();"></li>
-					<li><input type="password" name="login_pw" id="login_pw" class="lo_input01" placeholder="비밀번호" onkeydown="checkCapsLock(event)"></li>
+					<li><input type="text" name="login_id" id="login_id" value="admin"  placeholder="아이디" onKeyPress="if(event.keyCode==13) authCheck();"></li>
+					<li><input type="password" name="login_pw" id="login_pw" value="test1234!" class="lo_input01" placeholder="비밀번호" onkeydown="checkCapsLock(event)"></li>
 					<li class="listy" style="display:inline-block; float:left; width:auto; box-sizing:border-box; text-align:left;">
 						<label class="ch_container" style="display:inline-block;">
 				          <input type="checkbox" id="ch"> 아이디저장
